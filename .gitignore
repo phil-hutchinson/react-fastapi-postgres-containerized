@@ -1,0 +1,47 @@
+# Node (React frontend)
+node_modules/
+build/
+dist/
+.env
+.env.*
+
+# Python (FastAPI backend)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+ENV/
+.venv/
+
+# VS Code
+.vscode/
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# System
+.DS_Store
+Thumbs.db
+
+# Postgres
+pgdata/
+
+# Misc
+*.sqlite3
+.idea/
+*.swp
+
+# Coverage
+htmlcov/
+.coverage
+coverage.xml
+
+# Test
+pytest_cache/
+
+# Others
+*.egg-info/
+.eggs/
