@@ -17,6 +17,7 @@ ENV/
 
 # VS Code
 .vscode/
+!.vscode/launch.json
 
 # Docker
 *.log
