@@ -1,0 +1,9 @@
+  migrate:
+    build: ./backend
+    command: alembic upgrade head
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app
