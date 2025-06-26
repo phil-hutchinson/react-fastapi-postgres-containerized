@@ -1,3 +1,4 @@
+services:
   migrate:
     build: ./backend
     command: alembic upgrade head
