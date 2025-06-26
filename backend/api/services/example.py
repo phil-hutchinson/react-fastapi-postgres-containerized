@@ -32,10 +32,24 @@ def update_example(uuid: str, update: ExampleUpdate, db: Session = Depends(get_d
     example = db.query(Example).filter_by(uuid=uuid).first()
     if not example:
         raise HTTPException(status_code=404, detail="Example not found")
+    if example.finalized:
+        raise HTTPException(status_code=409, detail="Example is finalized and cannot be modified.")
     if update.name is not None:
         example.name = update.name
     if update.description is not None:
         example.description = update.description
+    db.commit()
+    db.refresh(example)
+    return {"uuid": str(example.uuid), "name": example.name, "description": example.description}
+
+@router.post("/{uuid}/finalize", response_model=ExampleDetail)
+def finalize_example(uuid: str, db: Session = Depends(get_db)):
+    example = db.query(Example).filter_by(uuid=uuid).first()
+    if not example:
+        raise HTTPException(status_code=404, detail="Example not found")
+    if example.finalized:
+        raise HTTPException(status_code=409, detail="Example is already finalized.")
+    example.finalized = True
     db.commit()
     db.refresh(example)
     return {"uuid": str(example.uuid), "name": example.name, "description": example.description}

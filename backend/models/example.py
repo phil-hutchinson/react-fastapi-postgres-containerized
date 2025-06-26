@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from .base import Base
 
@@ -9,3 +9,4 @@ class Example(Base):
     uuid = Column(UUID(as_uuid=True), unique=True, nullable=False, default=uuid.uuid4, index=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
+    finalized = Column(Boolean, nullable=False, default=False)
