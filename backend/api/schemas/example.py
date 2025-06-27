@@ -13,6 +13,7 @@ class ExampleDetail(BaseModel):
     uuid: str
     name: str
     description: Optional[str] = None
+    finalized: bool
 
 class ExampleUpdate(BaseModel):
     name: Optional[str] = None

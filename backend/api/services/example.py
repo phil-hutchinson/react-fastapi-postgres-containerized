@@ -13,11 +13,11 @@ def create_example(example: ExampleCreate, db: Session = Depends(get_db)):
     db.add(db_example)
     db.commit()
     db.refresh(db_example)
-    return {"uuid": str(db_example.uuid), "name": db_example.name, "description": db_example.description}
+    return {"uuid": str(db_example.uuid), "name": db_example.name, "description": db_example.description, "finalized": db_example.finalized}
 
 @router.get("/", response_model=List[ExampleSummary])
 def list_examples(db: Session = Depends(get_db)):
-    examples = db.query(Example).all()
+    examples = db.query(Example).order_by(Example.id.asc()).all()
     return [{"uuid": str(e.uuid), "name": e.name} for e in examples]
 
 @router.get("/{uuid}", response_model=ExampleDetail)
@@ -25,7 +25,7 @@ def get_example_detail(uuid: str, db: Session = Depends(get_db)):
     example = db.query(Example).filter_by(uuid=uuid).first()
     if not example:
         raise HTTPException(status_code=404, detail="Example not found")
-    return {"uuid": str(example.uuid), "name": example.name, "description": example.description}
+    return {"uuid": str(example.uuid), "name": example.name, "description": example.description, "finalized": example.finalized}
 
 @router.put("/{uuid}", response_model=ExampleDetail)
 def update_example(uuid: str, update: ExampleUpdate, db: Session = Depends(get_db)):
@@ -40,7 +40,7 @@ def update_example(uuid: str, update: ExampleUpdate, db: Session = Depends(get_d
         example.description = update.description
     db.commit()
     db.refresh(example)
-    return {"uuid": str(example.uuid), "name": example.name, "description": example.description}
+    return {"uuid": str(example.uuid), "name": example.name, "description": example.description, "finalized": example.finalized}
 
 @router.post("/{uuid}/finalize", response_model=ExampleDetail)
 def finalize_example(uuid: str, db: Session = Depends(get_db)):
@@ -52,4 +52,4 @@ def finalize_example(uuid: str, db: Session = Depends(get_db)):
     example.finalized = True
     db.commit()
     db.refresh(example)
-    return {"uuid": str(example.uuid), "name": example.name, "description": example.description}
+    return {"uuid": str(example.uuid), "name": example.name, "description": example.description, "finalized": example.finalized}
