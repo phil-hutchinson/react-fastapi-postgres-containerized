@@ -2,6 +2,7 @@ import React from 'react';
 import { ExamplesProvider, useExamples } from '../../hooks/useExamples';
 import ExampleList from './ExampleList';
 import AddExampleForm from './AddExampleForm';
+import EditExampleForm from './EditExampleForm';
 
 function ExamplesApp() {
   return (
@@ -36,34 +37,7 @@ function ExamplesAppContent() {
         <div style={{marginTop: '2em', padding: '1em', border: '1px solid #ccc'}}>
           <h3>Example Details</h3>
           {editMode ? (
-            <form onSubmit={handleUpdate} style={{marginBottom: '1em'}}>
-              <div>
-                <label>
-                  Name:
-                  <input
-                    type="text"
-                    value={editName}
-                    onChange={e => setEditName(e.target.value)}
-                    disabled={selectedExample.finalized}
-                    style={{marginLeft: '0.5em'}}
-                  />
-                </label>
-              </div>
-              <div style={{marginTop: '0.5em'}}>
-                <label>
-                  Description:
-                  <input
-                    type="text"
-                    value={editDescription}
-                    onChange={e => setEditDescription(e.target.value)}
-                    disabled={selectedExample.finalized}
-                    style={{marginLeft: '0.5em'}}
-                  />
-                </label>
-              </div>
-              <button type="submit" disabled={selectedExample.finalized} style={{marginTop: '1em'}}>Update</button>
-              <button type="button" onClick={handleCancelEdit} style={{marginLeft: '1em', marginTop: '1em'}}>Cancel</button>
-            </form>
+            <EditExampleForm />
           ) : (
             <div style={{marginBottom: '1em'}}>
               <div><strong>Name:</strong> {selectedExample.name}</div>
@@ -76,8 +50,6 @@ function ExamplesAppContent() {
               )}
             </div>
           )}
-          {updateError && <div style={{color: 'red'}}>{updateError}</div>}
-          {updateSuccess && <div style={{color: 'green'}}>{updateSuccess}</div>}
           {finalizeError && <div style={{color: 'red'}}>{finalizeError}</div>}
           {finalizeSuccess && <div style={{color: 'green'}}>{finalizeSuccess}</div>}
           {selectedExample.finalized && <div style={{color: 'gray', marginTop: '0.5em'}}><em>This example is finalized and cannot be edited.</em></div>}
