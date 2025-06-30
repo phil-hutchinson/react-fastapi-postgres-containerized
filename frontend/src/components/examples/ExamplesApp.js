@@ -15,13 +15,11 @@ function ExamplesApp() {
 
 function ExamplesAppContent() {
   const {
-    examples, examplesError, selectedExample, detailsError,
-    editName, setEditName, editDescription, setEditDescription,
-    updateError, updateSuccess, editMode, setEditMode,
-    addMode, addName, setAddName,
-    addDescription, setAddDescription, addError, addSuccess,
-    handleSelect, handleUpdate, handleEdit, handleCancelEdit,
-    handleAddClick, handleAddSubmit, handleAddCancel
+    selectedExample,
+    detailsError,
+    editMode,
+    addMode,
+    handleAddClick
   } = useExamples();
 
   return (
