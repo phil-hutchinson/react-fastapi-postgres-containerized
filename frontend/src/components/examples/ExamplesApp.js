@@ -3,6 +3,7 @@ import { ExamplesProvider, useExamples } from '../../hooks/useExamples';
 import ExampleList from './ExampleList';
 import AddExampleForm from './AddExampleForm';
 import EditExampleForm from './EditExampleForm';
+import DisplayExampleDetails from './DisplayExampleDetails';
 
 function ExamplesApp() {
   return (
@@ -17,10 +18,10 @@ function ExamplesAppContent() {
     examples, examplesError, selectedExample, detailsError,
     editName, setEditName, editDescription, setEditDescription,
     updateError, updateSuccess, editMode, setEditMode,
-    finalizeError, finalizeSuccess, addMode, addName, setAddName,
+    addMode, addName, setAddName,
     addDescription, setAddDescription, addError, addSuccess,
     handleSelect, handleUpdate, handleEdit, handleCancelEdit,
-    handleFinalize, handleAddClick, handleAddSubmit, handleAddCancel
+    handleAddClick, handleAddSubmit, handleAddCancel
   } = useExamples();
 
   return (
@@ -33,29 +34,16 @@ function ExamplesAppContent() {
       </div>
       {addMode ? (
         <AddExampleForm />
-      ) : selectedExample && (
+      ) : selectedExample || detailsError ? (
         <div style={{marginTop: '2em', padding: '1em', border: '1px solid #ccc'}}>
           <h3>Example Details</h3>
           {editMode ? (
             <EditExampleForm />
           ) : (
-            <div style={{marginBottom: '1em'}}>
-              <div><strong>Name:</strong> {selectedExample.name}</div>
-              <div><strong>Description:</strong> {selectedExample.description || <em>No description</em>}</div>
-              {!selectedExample.finalized && (
-                <>
-                  <button onClick={handleEdit} style={{marginTop: '1em', marginRight: '1em'}}>Edit</button>
-                  <button onClick={handleFinalize} style={{marginTop: '1em'}}>Finalize</button>
-                </>
-              )}
-            </div>
+            <DisplayExampleDetails />
           )}
-          {finalizeError && <div style={{color: 'red'}}>{finalizeError}</div>}
-          {finalizeSuccess && <div style={{color: 'green'}}>{finalizeSuccess}</div>}
-          {selectedExample.finalized && <div style={{color: 'gray', marginTop: '0.5em'}}><em>This example is finalized and cannot be edited.</em></div>}
         </div>
-      )}
-      {detailsError && <div style={{color: 'red'}}>{detailsError}</div>}
+      ) : null}
     </div>
   );
 }
