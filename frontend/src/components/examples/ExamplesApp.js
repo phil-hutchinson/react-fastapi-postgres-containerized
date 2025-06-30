@@ -1,5 +1,6 @@
 import React from 'react';
 import { ExamplesProvider, useExamples } from '../../hooks/useExamples';
+import ExampleList from './ExampleList';
 
 function ExamplesApp() {
   return (
@@ -26,18 +27,7 @@ function ExamplesAppContent() {
       <div>
         <h2>Examples from API:</h2>
         <button onClick={handleAddClick} disabled={addMode || editMode} style={{marginBottom: '1em'}}>Add Example</button>
-        {examplesError && <div style={{color: 'red'}}>{examplesError}</div>}
-        {examples.length > 0 ? (
-          <ul>
-            {examples.map(ex => (
-              <li key={ex.uuid}>
-                <button onClick={() => { handleSelect(ex.uuid); }} style={{background:'none',border:'none',color:'blue',textDecoration:'underline',cursor:'pointer'}}>
-                  <strong>{ex.name}</strong>
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : examplesError ? null : 'Loading...'}
+        <ExampleList examples={examples} onSelect={handleSelect} disabled={addMode || editMode} examplesError={examplesError} />
       </div>
       {addMode ? (
         <div style={{marginTop: '2em', padding: '1em', border: '1px solid #ccc'}}>
