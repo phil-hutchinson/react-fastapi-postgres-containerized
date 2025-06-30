@@ -1,15 +1,18 @@
 import React from 'react';
+import { useExamples } from '../../hooks/useExamples';
 
-function AddExampleForm({
-  addName,
-  setAddName,
-  addDescription,
-  setAddDescription,
-  handleAddSubmit,
-  handleAddCancel,
-  addError,
-  addSuccess
-}) {
+function AddExampleForm() {
+  const {
+    addName,
+    setAddName,
+    addDescription,
+    setAddDescription,
+    handleAddSubmit,
+    handleAddCancel,
+    addError,
+    addSuccess
+  } = useExamples();
+
   return (
     <div style={{marginTop: '2em', padding: '1em', border: '1px solid #ccc'}}>
       <h3>Add Example</h3>

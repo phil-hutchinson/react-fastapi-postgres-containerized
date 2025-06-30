@@ -28,19 +28,10 @@ function ExamplesAppContent() {
       <div>
         <h2>Examples from API:</h2>
         <button onClick={handleAddClick} disabled={addMode || editMode} style={{marginBottom: '1em'}}>Add Example</button>
-        <ExampleList examples={examples} onSelect={handleSelect} disabled={addMode || editMode} examplesError={examplesError} />
+        <ExampleList />
       </div>
       {addMode ? (
-        <AddExampleForm
-          addName={addName}
-          setAddName={setAddName}
-          addDescription={addDescription}
-          setAddDescription={setAddDescription}
-          handleAddSubmit={handleAddSubmit}
-          handleAddCancel={handleAddCancel}
-          addError={addError}
-          addSuccess={addSuccess}
-        />
+        <AddExampleForm />
       ) : selectedExample && (
         <div style={{marginTop: '2em', padding: '1em', border: '1px solid #ccc'}}>
           <h3>Example Details</h3>

@@ -1,6 +1,10 @@
 import React from 'react';
+import { useExamples } from '../../hooks/useExamples';
 
-function ExampleList({ examples, onSelect, disabled, examplesError }) {
+function ExampleList() {
+  const { examples, handleSelect, examplesError, addMode, editMode } = useExamples();
+  const disabled = addMode || editMode;
+
   if (examplesError) {
     return <div style={{color: 'red'}}>{examplesError}</div>;
   }
@@ -15,7 +19,7 @@ function ExampleList({ examples, onSelect, disabled, examplesError }) {
       {examples.map(ex => (
         <li key={ex.uuid}>
           <button
-            onClick={() => onSelect(ex.uuid)}
+            onClick={() => handleSelect(ex.uuid)}
             disabled={disabled}
             style={{background:'none',border:'none',color:'blue',textDecoration:'underline',cursor:'pointer'}}
           >
