@@ -1,2 +1,2 @@
 from .base import Base
-from .example import Example
+from .note import Note
