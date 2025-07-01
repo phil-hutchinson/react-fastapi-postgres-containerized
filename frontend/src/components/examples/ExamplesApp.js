@@ -39,7 +39,7 @@ function ExamplesAppContent() {
       {addMode ? (
         <AddExampleForm />
       ) : selectedExample || detailsError ? (
-        <div className="mt-8 selection-card w-full max-w-2xl transition-all duration-300 ease-in-out opacity-100 scale-100">
+        <div className="selection-card w-full max-w-2xl transition-all duration-300 ease-in-out opacity-100 scale-100">
           <h3 className="text-lg font-semibold mb-4 text-center">Example Details</h3>
           {editMode ? (
             <EditExampleForm />

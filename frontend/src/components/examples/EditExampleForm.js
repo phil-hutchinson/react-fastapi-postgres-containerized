@@ -17,36 +17,38 @@ function EditExampleForm() {
   if (!selectedExample) return null;
 
   return (
-    <form onSubmit={handleUpdate} className="section-content">
-      <div className="mb-4">
-        <label className="input-label" htmlFor="edit-name">Name:</label>
-        <input
-          id="edit-name"
-          type="text"
-          value={editName}
-          onChange={e => setEditName(e.target.value)}
-          disabled={selectedExample.finalized}
-          className="input-text"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="input-label" htmlFor="edit-description">Description:</label>
-        <input
-          id="edit-description"
-          type="text"
-          value={editDescription}
-          onChange={e => setEditDescription(e.target.value)}
-          disabled={selectedExample.finalized}
-          className="input-text"
-        />
-      </div>
-      <div className="button-group">
-        <button type="submit" disabled={selectedExample.finalized} className="btn">Update</button>
-        <button type="button" onClick={handleCancelEdit} className="btn btn-cancel">Cancel</button>
-      </div>
-      {updateError && <div className="error-message">{updateError}</div>}
-      {updateSuccess && <div className="success-message">{updateSuccess}</div>}
-    </form>
+    <div className="section-content">
+      <form onSubmit={handleUpdate}>
+        <div className="mb-4">
+          <label className="input-label" htmlFor="edit-name">Name:</label>
+          <input
+            id="edit-name"
+            type="text"
+            value={editName}
+            onChange={e => setEditName(e.target.value)}
+            disabled={selectedExample.finalized}
+            className="input-text"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="input-label" htmlFor="edit-description">Description:</label>
+          <input
+            id="edit-description"
+            type="text"
+            value={editDescription}
+            onChange={e => setEditDescription(e.target.value)}
+            disabled={selectedExample.finalized}
+            className="input-text"
+          />
+        </div>
+        <div className="button-group">
+          <button type="submit" disabled={selectedExample.finalized} className="btn">Update</button>
+          <button type="button" onClick={handleCancelEdit} className="btn btn-cancel">Cancel</button>
+        </div>
+        {updateError && <div className="error-message">{updateError}</div>}
+        {updateSuccess && <div className="success-message">{updateSuccess}</div>}
+      </form>
+    </div>
   );
 }
 

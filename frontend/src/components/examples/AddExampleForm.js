@@ -14,37 +14,37 @@ function AddExampleForm() {
   } = useExamples();
 
   return (
-    <div style={{marginTop: '2em', padding: '1em', border: '1px solid #ccc'}}>
-      <h3>Add Example</h3>
-      <form onSubmit={handleAddSubmit} style={{marginBottom: '1em'}}>
-        <div>
-          <label>
-            Name:
-            <input
-              type="text"
-              value={addName}
-              onChange={e => setAddName(e.target.value)}
-              required
-              style={{marginLeft: '0.5em'}}
-            />
-          </label>
+    <div className="section-content">
+      <h3 className="section-title">Add Example</h3>
+      <form onSubmit={handleAddSubmit} className="">
+        <div className="mb-4">
+          <label className="input-label" htmlFor="add-name">Name:</label>
+          <input
+            id="add-name"
+            type="text"
+            value={addName}
+            onChange={e => setAddName(e.target.value)}
+            required
+            className="input-text"
+          />
         </div>
-        <div style={{marginTop: '0.5em'}}>
-          <label>
-            Description:
-            <input
-              type="text"
-              value={addDescription}
-              onChange={e => setAddDescription(e.target.value)}
-              style={{marginLeft: '0.5em'}}
-            />
-          </label>
+        <div className="mb-4">
+          <label className="input-label" htmlFor="add-description">Description:</label>
+          <input
+            id="add-description"
+            type="text"
+            value={addDescription}
+            onChange={e => setAddDescription(e.target.value)}
+            className="input-text"
+          />
         </div>
-        <button type="submit" style={{marginTop: '1em'}}>Add</button>
-        <button type="button" onClick={handleAddCancel} style={{marginLeft: '1em', marginTop: '1em'}}>Cancel</button>
+        <div className="button-group">
+          <button type="submit" className="btn">Add</button>
+          <button type="button" onClick={handleAddCancel} className="btn btn-cancel">Cancel</button>
+        </div>
       </form>
-      {addError && <div style={{color: 'red'}}>{addError}</div>}
-      {addSuccess && <div style={{color: 'green'}}>{addSuccess}</div>}
+      {addError && <div className="error-message">{addError}</div>}
+      {addSuccess && <div className="success-message">{addSuccess}</div>}
     </div>
   );
 }
