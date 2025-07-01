@@ -17,35 +17,35 @@ function EditExampleForm() {
   if (!selectedExample) return null;
 
   return (
-    <form onSubmit={handleUpdate} style={{marginBottom: '1em'}}>
-      <div>
-        <label>
-          Name:
-          <input
-            type="text"
-            value={editName}
-            onChange={e => setEditName(e.target.value)}
-            disabled={selectedExample.finalized}
-            style={{marginLeft: '0.5em'}}
-          />
-        </label>
+    <form onSubmit={handleUpdate} className="section-content">
+      <div className="mb-4">
+        <label className="input-label" htmlFor="edit-name">Name:</label>
+        <input
+          id="edit-name"
+          type="text"
+          value={editName}
+          onChange={e => setEditName(e.target.value)}
+          disabled={selectedExample.finalized}
+          className="input-text"
+        />
       </div>
-      <div style={{marginTop: '0.5em'}}>
-        <label>
-          Description:
-          <input
-            type="text"
-            value={editDescription}
-            onChange={e => setEditDescription(e.target.value)}
-            disabled={selectedExample.finalized}
-            style={{marginLeft: '0.5em'}}
-          />
-        </label>
+      <div className="mb-4">
+        <label className="input-label" htmlFor="edit-description">Description:</label>
+        <input
+          id="edit-description"
+          type="text"
+          value={editDescription}
+          onChange={e => setEditDescription(e.target.value)}
+          disabled={selectedExample.finalized}
+          className="input-text"
+        />
       </div>
-      <button type="submit" disabled={selectedExample.finalized} style={{marginTop: '1em'}}>Update</button>
-      <button type="button" onClick={handleCancelEdit} style={{marginLeft: '1em', marginTop: '1em'}}>Cancel</button>
-      {updateError && <div style={{color: 'red'}}>{updateError}</div>}
-      {updateSuccess && <div style={{color: 'green'}}>{updateSuccess}</div>}
+      <div className="button-group">
+        <button type="submit" disabled={selectedExample.finalized} className="btn">Update</button>
+        <button type="button" onClick={handleCancelEdit} className="btn btn-cancel">Cancel</button>
+      </div>
+      {updateError && <div className="error-message">{updateError}</div>}
+      {updateSuccess && <div className="success-message">{updateSuccess}</div>}
     </form>
   );
 }

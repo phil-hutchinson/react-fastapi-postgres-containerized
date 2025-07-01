@@ -20,9 +20,33 @@
 }
 
 .btn {
-  @apply px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700 transition;
+  @apply px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700 transition disabled:opacity-50;
+}
+
+.btn-cancel {
+  @apply bg-gray-400 hover:bg-gray-500;
 }
 
 .section-content {
   @apply bg-white border border-gray-200 rounded-lg shadow p-6 mb-4;
+}
+
+.input-label {
+  @apply block font-medium mb-1;
+}
+
+.input-text {
+  @apply w-full border border-gray-300 rounded px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:bg-gray-100;
+}
+
+.button-group {
+  @apply flex gap-2 mt-4;
+}
+
+.error-message {
+  @apply text-red-600 mt-2;
+}
+
+.success-message {
+  @apply text-green-600 mt-2;
 }
