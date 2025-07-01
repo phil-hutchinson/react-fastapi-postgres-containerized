@@ -53,3 +53,14 @@ def finalize_example(uuid: str, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(example)
     return {"uuid": str(example.uuid), "name": example.name, "description": example.description, "finalized": example.finalized}
+
+@router.delete("/{uuid}", response_model=dict)
+def delete_example(uuid: str, db: Session = Depends(get_db)):
+    example = db.query(Example).filter_by(uuid=uuid).first()
+    if not example:
+        raise HTTPException(status_code=404, detail="Example not found")
+    if example.finalized:
+        raise HTTPException(status_code=409, detail="Example is finalized and cannot be deleted.")
+    db.delete(example)
+    db.commit()
+    return {"detail": "Note deleted"}

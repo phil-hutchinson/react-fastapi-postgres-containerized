@@ -6,6 +6,7 @@ function DisplayExampleDetails() {
     selectedExample,
     handleEdit,
     handleFinalize,
+    handleDelete,
     finalizeError,
     finalizeSuccess,
     detailsError
@@ -30,11 +31,12 @@ function DisplayExampleDetails() {
         <div className="button-group">
           <button onClick={handleEdit} className="btn">Edit</button>
           <button onClick={handleFinalize} className="btn">Finalize</button>
+          <button onClick={handleDelete} className="btn btn-cancel">Delete</button>
         </div>
       )}
       {finalizeError && <div className="error-message">{finalizeError}</div>}
       {finalizeSuccess && <div className="success-message">{finalizeSuccess}</div>}
-      {selectedExample.finalized && <div className="text-gray-500 mt-2"><em>This note is finalized and cannot be edited.</em></div>}
+      {selectedExample.finalized && <div className="text-gray-500 mt-2"><em>This note is finalized and cannot be edited or deleted.</em></div>}
     </div>
   );
 }

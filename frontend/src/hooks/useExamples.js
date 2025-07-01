@@ -158,6 +158,26 @@ function useExamplesProvider() {
     setAddSuccess(null);
   };
 
+  const handleDelete = () => {
+    if (!selectedExample || selectedExample.finalized) return;
+    if (window.confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
+      axios.delete(`http://localhost:8000/examples/${selectedExample.uuid}`)
+        .then(() => {
+          setExamples(examples.filter(ex => ex.uuid !== selectedExample.uuid));
+          setSelectedExample(null);
+          setEditMode(false);
+          setDetailsError(null);
+        })
+        .catch(err => {
+          if (err.response && err.response.status === 409) {
+            setDetailsError('Note is finalized and cannot be deleted.');
+          } else {
+            setDetailsError('Failed to delete note.');
+          }
+        });
+    }
+  };
+
   return {
     examples, setExamples,
     examplesError, setExamplesError,
@@ -183,6 +203,7 @@ function useExamplesProvider() {
     handleAddClick,
     handleAddSubmit,
     handleAddCancel,
+    handleDelete,
   };
 }
 
