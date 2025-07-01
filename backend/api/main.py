@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.services import example as example_router
+from api.services import note as note_router
 
 def create_app():
     app = FastAPI()
@@ -14,7 +14,7 @@ def create_app():
         allow_headers=["*"],
     )
 
-    app.include_router(example_router.router)
+    app.include_router(note_router.router)
 
     @app.get("/")
     def read_root():
