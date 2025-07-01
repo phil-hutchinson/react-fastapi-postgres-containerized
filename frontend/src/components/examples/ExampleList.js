@@ -21,7 +21,7 @@ function ExampleList() {
           <button
             onClick={() => handleSelect(ex.uuid)}
             disabled={disabled}
-            style={{background:'none',border:'none',color:'blue',textDecoration:'underline',cursor:'pointer'}}
+            className="selection-card"
           >
             <strong>{ex.name}</strong>
           </button>

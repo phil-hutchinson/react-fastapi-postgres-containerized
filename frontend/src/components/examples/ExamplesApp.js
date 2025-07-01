@@ -23,25 +23,29 @@ function ExamplesAppContent() {
   } = useExamples();
 
   return (
-    <div>
-      <h1>Starter App: React &mdash; FastAPI &mdash; Postgres</h1>
-      <div>
-        <h2>Examples from API:</h2>
-        <button onClick={handleAddClick} disabled={addMode || editMode} style={{marginBottom: '1em'}}>Add Example</button>
+    <div className="layout-container min-h-screen flex flex-col items-center bg-gray-50">
+      <h1 className="app-title">Template App: React &ndash; FastAPI &ndash; Postgres</h1>
+      <div className="w-full max-w-2xl">
+        <h2 className="section-title">Example Content:</h2>
         <ExampleList />
+        <button
+          onClick={handleAddClick}
+          disabled={addMode || editMode}
+          className="btn mt-4 w-full"
+        >
+          Add Example
+        </button>
+        {addMode ? (
+          <AddExampleForm />
+        ) : selectedExample || detailsError ?
+            editMode ? (
+              <EditExampleForm />
+            ) : (
+              <DisplayExampleDetails />
+            )
+          : null
+        }
       </div>
-      {addMode ? (
-        <AddExampleForm />
-      ) : selectedExample || detailsError ? (
-        <div style={{marginTop: '2em', padding: '1em', border: '1px solid #ccc'}}>
-          <h3>Example Details</h3>
-          {editMode ? (
-            <EditExampleForm />
-          ) : (
-            <DisplayExampleDetails />
-          )}
-        </div>
-      ) : null}
     </div>
   );
 }

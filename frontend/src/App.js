@@ -1,3 +1,4 @@
+import './index.css';
 import ExamplesApp from './components/examples/ExamplesApp';
 
 function App() {
