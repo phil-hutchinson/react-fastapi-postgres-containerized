@@ -31,9 +31,9 @@ function useExamplesProvider() {
   const [lockSuccess, setLockSuccess] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/examples/')
+    axios.get('http://localhost:8000/notes/')
       .then(res => setExamples(res.data))
-      .catch(() => setExamplesError('Could not fetch examples'));
+      .catch(() => setExamplesError('Could not fetch notes'));
   }, []);
 
   const handleSelect = (uuid) => {
@@ -44,14 +44,14 @@ function useExamplesProvider() {
     setUpdateSuccess(null);
     setEditMode(false);
     setAddMode(false);
-    axios.get(`http://localhost:8000/examples/${uuid}`)
+    axios.get(`http://localhost:8000/notes/${uuid}`)
       .then(res => {
         setSelectedExample(res.data);
         setEditName(res.data.name);
         setEditDescription(res.data.description || '');
       })
       .catch(() => {
-        setDetailsError('Could not fetch example details');
+        setDetailsError('Could not fetch note details');
         setSelectedExample(null);
       });
   };
@@ -60,13 +60,14 @@ function useExamplesProvider() {
     e.preventDefault();
     setUpdateError(null);
     setUpdateSuccess(null);
-    axios.put(`http://localhost:8000/examples/${selectedExample.uuid}`, {
-      name: editName,
-      description: editDescription
-    })
+    axios.put(`http://localhost:8000/notes/${selectedExample.uuid}`,
+      {
+        name: editName,
+        description: editDescription
+      })
       .then(res => {
         setSelectedExample(res.data);
-        setUpdateSuccess('Example updated successfully!');
+        setUpdateSuccess('Note updated successfully!');
         setEditMode(false);
         setExamples(examples.map(ex =>
           ex.uuid === selectedExample.uuid ? { ...ex, name: res.data.name } : ex
@@ -74,9 +75,9 @@ function useExamplesProvider() {
       })
       .catch(err => {
         if (err.response && err.response.status === 409) {
-          setUpdateError('Example is finalized and cannot be modified.');
+          setUpdateError('Note is locked and cannot be modified.');
         } else {
-          setUpdateError('Failed to update example.');
+          setUpdateError('Failed to update note.');
         }
       });
   };
@@ -100,7 +101,7 @@ function useExamplesProvider() {
     setLockSuccess(null);
     if (!selectedExample || selectedExample.finalized) return;
     if (window.confirm('Are you sure you want to lock this note? This action cannot be undone.')) {
-      axios.put(`http://localhost:8000/examples/${selectedExample.uuid}/lock`)
+      axios.put(`http://localhost:8000/notes/${selectedExample.uuid}/lock`)
         .then(res => {
           setSelectedExample(res.data);
           setLockSuccess('Note locked successfully!');
@@ -133,7 +134,7 @@ function useExamplesProvider() {
     e.preventDefault();
     setAddError(null);
     setAddSuccess(null);
-    axios.post("http://localhost:8000/examples/", {
+    axios.post("http://localhost:8000/notes/", {
       name: addName,
       description: addDescription
     })
@@ -143,11 +144,11 @@ function useExamplesProvider() {
         setEditName(res.data.name);
         setEditDescription(res.data.description || "");
         setAddMode(false);
-        setAddSuccess("Example added successfully!");
+        setAddSuccess("Note added successfully!");
         setAddName("");
         setAddDescription("");
       })
-      .catch(() => setAddError("Failed to add example."));
+      .catch(() => setAddError("Failed to add note."));
   };
 
   const handleAddCancel = () => {
@@ -161,7 +162,7 @@ function useExamplesProvider() {
   const handleDelete = () => {
     if (!selectedExample || selectedExample.finalized) return;
     if (window.confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
-      axios.delete(`http://localhost:8000/examples/${selectedExample.uuid}`)
+      axios.delete(`http://localhost:8000/notes/${selectedExample.uuid}`)
         .then(() => {
           setExamples(examples.filter(ex => ex.uuid !== selectedExample.uuid));
           setSelectedExample(null);
@@ -170,7 +171,7 @@ function useExamplesProvider() {
         })
         .catch(err => {
           if (err.response && err.response.status === 409) {
-            setDetailsError('Note is finalized and cannot be deleted.');
+            setDetailsError('Note is locked and cannot be deleted.');
           } else {
             setDetailsError('Failed to delete note.');
           }
