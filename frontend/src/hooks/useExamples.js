@@ -22,13 +22,13 @@ function useExamplesProvider() {
   const [updateError, setUpdateError] = useState(null);
   const [updateSuccess, setUpdateSuccess] = useState(null);
   const [editMode, setEditMode] = useState(false);
-  const [finalizeError, setFinalizeError] = useState(null);
-  const [finalizeSuccess, setFinalizeSuccess] = useState(null);
   const [addMode, setAddMode] = useState(false);
   const [addName, setAddName] = useState("");
   const [addDescription, setAddDescription] = useState("");
   const [addError, setAddError] = useState(null);
   const [addSuccess, setAddSuccess] = useState(null);
+  const [lockError, setLockError] = useState(null);
+  const [lockSuccess, setLockSuccess] = useState(null);
 
   useEffect(() => {
     axios.get('http://localhost:8000/examples/')
@@ -95,15 +95,15 @@ function useExamplesProvider() {
     setUpdateSuccess(null);
   };
 
-  const handleFinalize = () => {
-    setFinalizeError(null);
-    setFinalizeSuccess(null);
+  const handleLock = () => {
+    setLockError(null);
+    setLockSuccess(null);
     if (!selectedExample || selectedExample.finalized) return;
-    if (window.confirm('Are you sure you want to finalize this example? This action cannot be undone.')) {
-      axios.post(`http://localhost:8000/examples/${selectedExample.uuid}/finalize`)
+    if (window.confirm('Are you sure you want to lock this note? This action cannot be undone.')) {
+      axios.put(`http://localhost:8000/examples/${selectedExample.uuid}/lock`)
         .then(res => {
           setSelectedExample(res.data);
-          setFinalizeSuccess('Example finalized successfully!');
+          setLockSuccess('Note locked successfully!');
           setEditMode(false);
           setExamples(examples.map(ex =>
             ex.uuid === selectedExample.uuid ? { ...ex, name: res.data.name } : ex
@@ -111,9 +111,9 @@ function useExamplesProvider() {
         })
         .catch(err => {
           if (err.response && err.response.status === 409) {
-            setFinalizeError('Example is already finalized.');
+            setLockError('Note is already locked.');
           } else {
-            setFinalizeError('Failed to finalize example.');
+            setLockError('Failed to lock note.');
           }
         });
     }
@@ -188,22 +188,12 @@ function useExamplesProvider() {
     updateError, setUpdateError,
     updateSuccess, setUpdateSuccess,
     editMode, setEditMode,
-    finalizeError, setFinalizeError,
-    finalizeSuccess, setFinalizeSuccess,
     addMode, setAddMode,
     addName, setAddName,
     addDescription, setAddDescription,
     addError, setAddError,
     addSuccess, setAddSuccess,
-    handleSelect,
-    handleUpdate,
-    handleEdit,
-    handleCancelEdit,
-    handleFinalize,
-    handleAddClick,
-    handleAddSubmit,
-    handleAddCancel,
-    handleDelete,
+    lockError, lockSuccess, handleSelect, handleUpdate, handleEdit, handleCancelEdit, handleLock, handleAddClick, handleAddSubmit, handleAddCancel, handleDelete,
   };
 }
 

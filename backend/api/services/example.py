@@ -42,13 +42,13 @@ def update_example(uuid: str, update: ExampleUpdate, db: Session = Depends(get_d
     db.refresh(example)
     return {"uuid": str(example.uuid), "name": example.name, "description": example.description, "finalized": example.finalized}
 
-@router.post("/{uuid}/finalize", response_model=ExampleDetail)
-def finalize_example(uuid: str, db: Session = Depends(get_db)):
+@router.put("/{uuid}/lock", response_model=ExampleDetail)
+def lock_example(uuid: str, db: Session = Depends(get_db)):
     example = db.query(Example).filter_by(uuid=uuid).first()
     if not example:
-        raise HTTPException(status_code=404, detail="Example not found")
+        raise HTTPException(status_code=404, detail="Note not found")
     if example.finalized:
-        raise HTTPException(status_code=409, detail="Example is already finalized.")
+        raise HTTPException(status_code=409, detail="Note is already locked.")
     example.finalized = True
     db.commit()
     db.refresh(example)

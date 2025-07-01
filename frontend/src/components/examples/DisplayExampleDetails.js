@@ -5,10 +5,10 @@ function DisplayExampleDetails() {
   const {
     selectedExample,
     handleEdit,
-    handleFinalize,
+    handleLock,
     handleDelete,
-    finalizeError,
-    finalizeSuccess,
+    lockError,
+    lockSuccess,
     detailsError
   } = useExamples();
 
@@ -30,13 +30,13 @@ function DisplayExampleDetails() {
       {!selectedExample.finalized && (
         <div className="button-group">
           <button onClick={handleEdit} className="btn">Edit</button>
-          <button onClick={handleFinalize} className="btn">Finalize</button>
+          <button onClick={handleLock} className="btn">Lock</button>
           <button onClick={handleDelete} className="btn btn-cancel">Delete</button>
         </div>
       )}
-      {finalizeError && <div className="error-message">{finalizeError}</div>}
-      {finalizeSuccess && <div className="success-message">{finalizeSuccess}</div>}
-      {selectedExample.finalized && <div className="text-gray-500 mt-2"><em>This note is finalized and cannot be edited or deleted.</em></div>}
+      {lockError && <div className="error-message">{lockError}</div>}
+      {lockSuccess && <div className="success-message">{lockSuccess}</div>}
+      {selectedExample.finalized && <div className="text-gray-500 mt-2"><em>This note is locked and cannot be edited or deleted.</em></div>}
     </div>
   );
 }
