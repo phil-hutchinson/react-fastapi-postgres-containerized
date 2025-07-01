@@ -23,18 +23,24 @@ function ExamplesAppContent() {
   } = useExamples();
 
   return (
-    <div className="bg-blue-500 text-white p-4 rounded">
-      <h1>Starter App: React &mdash; FastAPI &mdash; Postgres</h1>
-      <div>
-        <h2>Examples from API:</h2>
-        <button onClick={handleAddClick} disabled={addMode || editMode} style={{marginBottom: '1em'}}>Add Example</button>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+      <h1 className="text-3xl font-bold mb-6 text-center">Template App: React &ndash; FastAPI &ndash; Postgres</h1>
+      <div className="w-full max-w-2xl">
+        <h2 className="text-xl font-semibold mb-4 text-center">Example Content:</h2>
         <ExampleList />
+        <button
+          onClick={handleAddClick}
+          disabled={addMode || editMode}
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 w-full"
+        >
+          Add Example
+        </button>
       </div>
       {addMode ? (
         <AddExampleForm />
       ) : selectedExample || detailsError ? (
-        <div style={{marginTop: '2em', padding: '1em', border: '1px solid #ccc'}}>
-          <h3>Example Details</h3>
+        <div className="mt-8 p-6 border border-gray-300 rounded bg-white w-full max-w-2xl">
+          <h3 className="text-lg font-semibold mb-4 text-center">Example Details</h3>
           {editMode ? (
             <EditExampleForm />
           ) : (

@@ -21,7 +21,7 @@ function ExampleList() {
           <button
             onClick={() => handleSelect(ex.uuid)}
             disabled={disabled}
-            style={{background:'none',border:'none',color:'blue',textDecoration:'underline',cursor:'pointer'}}
+            className="block w-full text-left px-4 py-2 mb-2 bg-white rounded shadow hover:bg-blue-100 transition-colors cursor-pointer text-blue-700 font-medium"
           >
             <strong>{ex.name}</strong>
           </button>
