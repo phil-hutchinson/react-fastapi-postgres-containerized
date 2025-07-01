@@ -1,20 +1,20 @@
 from pydantic import BaseModel
 from typing import Optional
 
-class ExampleCreate(BaseModel):
+class NoteCreate(BaseModel):
     name: str
     description: Optional[str] = None
 
-class ExampleSummary(BaseModel):
+class NoteSummary(BaseModel):
     uuid: str
     name: str
 
-class ExampleDetail(BaseModel):
+class NoteDetail(BaseModel):
     uuid: str
     name: str
     description: Optional[str] = None
     finalized: bool
 
-class ExampleUpdate(BaseModel):
+class NoteUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
