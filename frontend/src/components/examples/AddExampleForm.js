@@ -15,7 +15,7 @@ function AddExampleForm() {
 
   return (
     <div className="section-content">
-      <h3 className="section-title">Add Example</h3>
+      <h3 className="section-title">Add Note</h3>
       <form onSubmit={handleAddSubmit} className="">
         <div className="mb-4">
           <label className="input-label" htmlFor="add-name">Name:</label>

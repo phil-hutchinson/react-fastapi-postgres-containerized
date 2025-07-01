@@ -17,7 +17,7 @@ function DisplayExampleDetails() {
 
   return (
     <div className="section-content">
-      <h3 className="section-title">Example Details</h3>
+      <h3 className="section-title">Note Details</h3>
       <div className="mb-4">
         <span className="display-label">Name:</span>
         <div className="display-value">{selectedExample.name}</div>
@@ -34,7 +34,7 @@ function DisplayExampleDetails() {
       )}
       {finalizeError && <div className="error-message">{finalizeError}</div>}
       {finalizeSuccess && <div className="success-message">{finalizeSuccess}</div>}
-      {selectedExample.finalized && <div className="text-gray-500 mt-2"><em>This example is finalized and cannot be edited.</em></div>}
+      {selectedExample.finalized && <div className="text-gray-500 mt-2"><em>This note is finalized and cannot be edited.</em></div>}
     </div>
   );
 }

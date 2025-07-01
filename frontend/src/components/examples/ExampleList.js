@@ -12,7 +12,7 @@ function ExampleList() {
     return <div>Loading...</div>;
   }
   if (examples.length === 0) {
-    return <div>No examples found.</div>;
+    return <div>No notes found.</div>;
   }
   return (
     <ul>

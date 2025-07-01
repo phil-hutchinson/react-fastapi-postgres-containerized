@@ -18,7 +18,7 @@ function EditExampleForm() {
 
   return (
     <div className="section-content">
-      <h3 className="section-title">Edit Example</h3>
+      <h3 className="section-title">Edit Note</h3>
       <form onSubmit={handleUpdate}>
         <div className="mb-4">
           <label className="input-label" htmlFor="edit-name">Name:</label>

@@ -33,7 +33,7 @@ function ExamplesAppContent() {
           disabled={addMode || editMode}
           className="btn mt-4 w-full"
         >
-          Add Example
+          Add Note
         </button>
         {addMode ? (
           <AddExampleForm />
