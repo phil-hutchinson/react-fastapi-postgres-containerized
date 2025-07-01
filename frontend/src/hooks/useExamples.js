@@ -38,7 +38,6 @@ function useExamplesProvider() {
 
   const handleSelect = (uuid) => {
     setDetailsError(null);
-    setSelectedExample(null);
     setEditName('');
     setEditDescription('');
     setUpdateError(null);
@@ -51,7 +50,10 @@ function useExamplesProvider() {
         setEditName(res.data.name);
         setEditDescription(res.data.description || '');
       })
-      .catch(() => setDetailsError('Could not fetch example details'));
+      .catch(() => {
+        setDetailsError('Could not fetch example details');
+        setSelectedExample(null);
+      });
   };
 
   const handleUpdate = (e) => {
