@@ -16,7 +16,7 @@
 }
 
 .selection-card {
-  @apply bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition cursor-pointer p-4 mb-2;
+  @apply block w-full text-left px-4 py-2 mb-2 bg-white rounded shadow hover:bg-blue-100 transition-colors cursor-pointer text-blue-700 font-medium;
 }
 
 .btn {
@@ -28,7 +28,7 @@
 }
 
 .section-content {
-  @apply bg-white border border-gray-200 rounded-lg shadow p-6 mt-8 mb-4 w-full max-w-2xl;
+  @apply block w-full bg-white border border-gray-200 rounded-lg shadow p-6 mt-8 mb-4;
 }
 
 .input-label {

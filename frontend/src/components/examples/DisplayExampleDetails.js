@@ -17,6 +17,7 @@ function DisplayExampleDetails() {
 
   return (
     <div className="section-content">
+      <h3 className="section-title">Example Details</h3>
       <div><strong>Name:</strong> {selectedExample.name}</div>
       <div><strong>Description:</strong> {selectedExample.description || <em>No description</em>}</div>
       {!selectedExample.finalized && (

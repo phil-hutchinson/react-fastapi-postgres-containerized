@@ -31,23 +31,21 @@ function ExamplesAppContent() {
         <button
           onClick={handleAddClick}
           disabled={addMode || editMode}
-          className="btn mt-4 w-full disabled:opacity-50"
+          className="btn mt-4 w-full"
         >
           Add Example
         </button>
+        {addMode ? (
+          <AddExampleForm />
+        ) : selectedExample || detailsError ?
+            editMode ? (
+              <EditExampleForm />
+            ) : (
+              <DisplayExampleDetails />
+            )
+          : null
+        }
       </div>
-      {addMode ? (
-        <AddExampleForm />
-      ) : selectedExample || detailsError ? (
-        <div className="selection-card w-full max-w-2xl transition-all duration-300 ease-in-out opacity-100 scale-100">
-          <h3 className="text-lg font-semibold mb-4 text-center">Example Details</h3>
-          {editMode ? (
-            <EditExampleForm />
-          ) : (
-            <DisplayExampleDetails />
-          )}
-        </div>
-      ) : null}
     </div>
   );
 }
