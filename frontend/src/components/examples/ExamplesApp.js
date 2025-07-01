@@ -23,7 +23,7 @@ function ExamplesAppContent() {
   } = useExamples();
 
   return (
-    <div>
+    <div className="bg-blue-500 text-white p-4 rounded">
       <h1>Starter App: React &mdash; FastAPI &mdash; Postgres</h1>
       <div>
         <h2>Examples from API:</h2>
