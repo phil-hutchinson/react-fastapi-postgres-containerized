@@ -23,7 +23,7 @@ function ExamplesAppContent() {
   } = useExamples();
 
   return (
-    <div className="layout-container min-h-screen flex flex-col items-center justify-center bg-gray-50">
+    <div className="layout-container min-h-screen flex flex-col items-center bg-gray-50">
       <h1 className="app-title">Template App: React &ndash; FastAPI &ndash; Postgres</h1>
       <div className="w-full max-w-2xl">
         <h2 className="section-title">Example Content:</h2>
