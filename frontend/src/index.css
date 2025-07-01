@@ -32,7 +32,7 @@
 }
 
 .input-label {
-  @apply block font-medium mb-1;
+  @apply block font-semibold mb-1;
 }
 
 .input-text {
@@ -49,4 +49,12 @@
 
 .success-message {
   @apply text-green-600 mt-2;
+}
+
+.display-label {
+  @apply block font-semibold mb-1;
+}
+
+.display-value {
+  @apply w-full mb-4;
 }

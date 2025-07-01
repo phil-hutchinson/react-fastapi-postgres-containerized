@@ -18,16 +18,22 @@ function DisplayExampleDetails() {
   return (
     <div className="section-content">
       <h3 className="section-title">Example Details</h3>
-      <div><strong>Name:</strong> {selectedExample.name}</div>
-      <div><strong>Description:</strong> {selectedExample.description || <em>No description</em>}</div>
+      <div className="mb-4">
+        <span className="display-label">Name:</span>
+        <div className="display-value">{selectedExample.name}</div>
+      </div>
+      <div className="mb-4">
+        <span className="display-label">Description:</span>
+        <div className="display-value">{selectedExample.description || <em>No description</em>}</div>
+      </div>
       {!selectedExample.finalized && (
-        <div className="mt-4 flex gap-2">
+        <div className="button-group">
           <button onClick={handleEdit} className="btn">Edit</button>
           <button onClick={handleFinalize} className="btn">Finalize</button>
         </div>
       )}
-      {finalizeError && <div className="text-red-600 mt-2">{finalizeError}</div>}
-      {finalizeSuccess && <div className="text-green-600 mt-2">{finalizeSuccess}</div>}
+      {finalizeError && <div className="error-message">{finalizeError}</div>}
+      {finalizeSuccess && <div className="success-message">{finalizeSuccess}</div>}
       {selectedExample.finalized && <div className="text-gray-500 mt-2"><em>This example is finalized and cannot be edited.</em></div>}
     </div>
   );
