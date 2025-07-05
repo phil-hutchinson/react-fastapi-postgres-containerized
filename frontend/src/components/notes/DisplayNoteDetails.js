@@ -27,7 +27,7 @@ function DisplayNoteDetails() {
         <span className="display-label">Description:</span>
         <div className="display-value">{selectedNote.description || <em>No description</em>}</div>
       </div>
-      {!selectedNote.finalized && (
+      {!selectedNote.locked && (
         <div className="button-group">
           <button onClick={handleEdit} className="btn">Edit</button>
           <button onClick={handleLock} className="btn">Lock</button>
@@ -36,7 +36,7 @@ function DisplayNoteDetails() {
       )}
       {lockError && <div className="error-message">{lockError}</div>}
       {lockSuccess && <div className="success-message">{lockSuccess}</div>}
-      {selectedNote.finalized && <div className="text-gray-500 mt-2"><em>This note is locked and cannot be edited or deleted.</em></div>}
+      {selectedNote.locked && <div className="text-gray-500 mt-2"><em>This note is locked and cannot be edited or deleted.</em></div>}
     </div>
   );
 }

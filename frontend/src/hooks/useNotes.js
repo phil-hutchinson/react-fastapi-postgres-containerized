@@ -99,7 +99,7 @@ function useNotesProvider() {
   const handleLock = () => {
     setLockError(null);
     setLockSuccess(null);
-    if (!selectedNote || selectedNote.finalized) return;
+    if (!selectedNote || selectedNote.locked) return;
     if (window.confirm('Are you sure you want to lock this note? This action cannot be undone.')) {
       axios.put(`http://localhost:8000/notes/${selectedNote.uuid}/lock`)
         .then(res => {
@@ -160,7 +160,7 @@ function useNotesProvider() {
   };
 
   const handleDelete = () => {
-    if (!selectedNote || selectedNote.finalized) return;
+    if (!selectedNote || selectedNote.locked) return;
     if (window.confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
       axios.delete(`http://localhost:8000/notes/${selectedNote.uuid}`)
         .then(() => {

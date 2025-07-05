@@ -27,7 +27,7 @@ function EditNoteForm() {
             type="text"
             value={editName}
             onChange={e => setEditName(e.target.value)}
-            disabled={selectedNote.finalized}
+            disabled={selectedNote.locked}
             className="input-text"
           />
         </div>
@@ -38,12 +38,12 @@ function EditNoteForm() {
             type="text"
             value={editDescription}
             onChange={e => setEditDescription(e.target.value)}
-            disabled={selectedNote.finalized}
+            disabled={selectedNote.locked}
             className="input-text"
           />
         </div>
         <div className="button-group">
-          <button type="submit" disabled={selectedNote.finalized} className="btn">Update</button>
+          <button type="submit" disabled={selectedNote.locked} className="btn">Update</button>
           <button type="button" onClick={handleCancelEdit} className="btn btn-cancel">Cancel</button>
         </div>
         {updateError && <div className="error-message">{updateError}</div>}
