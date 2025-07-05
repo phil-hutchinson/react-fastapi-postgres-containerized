@@ -1,5 +1,5 @@
 import React from 'react';
-import { useExamples } from '../../hooks/useExamples';
+import { useNotes } from '../../hooks/useNotes';
 
 function AddNoteForm() {
   const {
@@ -11,7 +11,7 @@ function AddNoteForm() {
     handleAddCancel,
     addError,
     addSuccess
-  } = useExamples();
+  } = useNotes();
 
   return (
     <div className="section-content">

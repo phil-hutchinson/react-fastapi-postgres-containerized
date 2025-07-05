@@ -1,21 +1,21 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
-const ExamplesContext = createContext();
+const NotesContext = createContext();
 
-export function ExamplesProvider({ children }) {
-  const value = useExamplesProvider();
+export function NotesProvider({ children }) {
+  const value = useNotesProvider();
   return (
-    <ExamplesContext.Provider value={value}>
+    <NotesContext.Provider value={value}>
       {children}
-    </ExamplesContext.Provider>
+    </NotesContext.Provider>
   );
 }
 
-function useExamplesProvider() {
-  const [examples, setExamples] = useState([]);
-  const [examplesError, setExamplesError] = useState(null);
-  const [selectedExample, setSelectedExample] = useState(null);
+function useNotesProvider() {
+  const [notes, setNotes] = useState([]);
+  const [notesError, setNotesError] = useState(null);
+  const [selectedNote, setSelectedNote] = useState(null);
   const [detailsError, setDetailsError] = useState(null);
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
@@ -32,8 +32,8 @@ function useExamplesProvider() {
 
   useEffect(() => {
     axios.get('http://localhost:8000/notes/')
-      .then(res => setExamples(res.data))
-      .catch(() => setExamplesError('Could not fetch notes'));
+      .then(res => setNotes(res.data))
+      .catch(() => setNotesError('Could not fetch notes'));
   }, []);
 
   const handleSelect = (uuid) => {
@@ -46,13 +46,13 @@ function useExamplesProvider() {
     setAddMode(false);
     axios.get(`http://localhost:8000/notes/${uuid}`)
       .then(res => {
-        setSelectedExample(res.data);
+        setSelectedNote(res.data);
         setEditName(res.data.name);
         setEditDescription(res.data.description || '');
       })
       .catch(() => {
         setDetailsError('Could not fetch note details');
-        setSelectedExample(null);
+        setSelectedNote(null);
       });
   };
 
@@ -60,17 +60,17 @@ function useExamplesProvider() {
     e.preventDefault();
     setUpdateError(null);
     setUpdateSuccess(null);
-    axios.put(`http://localhost:8000/notes/${selectedExample.uuid}`,
+    axios.put(`http://localhost:8000/notes/${selectedNote.uuid}`,
       {
         name: editName,
         description: editDescription
       })
       .then(res => {
-        setSelectedExample(res.data);
+        setSelectedNote(res.data);
         setUpdateSuccess('Note updated successfully!');
         setEditMode(false);
-        setExamples(examples.map(ex =>
-          ex.uuid === selectedExample.uuid ? { ...ex, name: res.data.name } : ex
+        setNotes(notes.map(n =>
+          n.uuid === selectedNote.uuid ? { ...n, name: res.data.name } : n
         ));
       })
       .catch(err => {
@@ -90,8 +90,8 @@ function useExamplesProvider() {
 
   const handleCancelEdit = () => {
     setEditMode(false);
-    setEditName(selectedExample.name);
-    setEditDescription(selectedExample.description || '');
+    setEditName(selectedNote.name);
+    setEditDescription(selectedNote.description || '');
     setUpdateError(null);
     setUpdateSuccess(null);
   };
@@ -99,15 +99,15 @@ function useExamplesProvider() {
   const handleLock = () => {
     setLockError(null);
     setLockSuccess(null);
-    if (!selectedExample || selectedExample.finalized) return;
+    if (!selectedNote || selectedNote.finalized) return;
     if (window.confirm('Are you sure you want to lock this note? This action cannot be undone.')) {
-      axios.put(`http://localhost:8000/notes/${selectedExample.uuid}/lock`)
+      axios.put(`http://localhost:8000/notes/${selectedNote.uuid}/lock`)
         .then(res => {
-          setSelectedExample(res.data);
+          setSelectedNote(res.data);
           setLockSuccess('Note locked successfully!');
           setEditMode(false);
-          setExamples(examples.map(ex =>
-            ex.uuid === selectedExample.uuid ? { ...ex, name: res.data.name } : ex
+          setNotes(notes.map(n =>
+            n.uuid === selectedNote.uuid ? { ...n, name: res.data.name } : n
           ));
         })
         .catch(err => {
@@ -122,7 +122,7 @@ function useExamplesProvider() {
 
   const handleAddClick = () => {
     setAddMode(true);
-    setSelectedExample(null);
+    setSelectedNote(null);
     setEditMode(false);
     setAddName("");
     setAddDescription("");
@@ -139,8 +139,8 @@ function useExamplesProvider() {
       description: addDescription
     })
       .then(res => {
-        setExamples([...examples, { uuid: res.data.uuid, name: res.data.name }]);
-        setSelectedExample(res.data);
+        setNotes([...notes, { uuid: res.data.uuid, name: res.data.name }]);
+        setSelectedNote(res.data);
         setEditName(res.data.name);
         setEditDescription(res.data.description || "");
         setAddMode(false);
@@ -160,12 +160,12 @@ function useExamplesProvider() {
   };
 
   const handleDelete = () => {
-    if (!selectedExample || selectedExample.finalized) return;
+    if (!selectedNote || selectedNote.finalized) return;
     if (window.confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
-      axios.delete(`http://localhost:8000/notes/${selectedExample.uuid}`)
+      axios.delete(`http://localhost:8000/notes/${selectedNote.uuid}`)
         .then(() => {
-          setExamples(examples.filter(ex => ex.uuid !== selectedExample.uuid));
-          setSelectedExample(null);
+          setNotes(notes.filter(n => n.uuid !== selectedNote.uuid));
+          setSelectedNote(null);
           setEditMode(false);
           setDetailsError(null);
         })
@@ -180,9 +180,9 @@ function useExamplesProvider() {
   };
 
   return {
-    examples, setExamples,
-    examplesError, setExamplesError,
-    selectedExample, setSelectedExample,
+    notes, setNotes,
+    notesError, setNotesError,
+    selectedNote, setSelectedNote,
     detailsError, setDetailsError,
     editName, setEditName,
     editDescription, setEditDescription,
@@ -198,6 +198,6 @@ function useExamplesProvider() {
   };
 }
 
-export function useExamples() {
-  return useContext(ExamplesContext);
+export function useNotes() {
+  return useContext(NotesContext);
 }

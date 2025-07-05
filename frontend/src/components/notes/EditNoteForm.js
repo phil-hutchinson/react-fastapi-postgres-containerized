@@ -1,9 +1,9 @@
 import React from 'react';
-import { useExamples } from '../../hooks/useExamples';
+import { useNotes } from '../../hooks/useNotes';
 
 function EditNoteForm() {
   const {
-    selectedExample,
+    selectedNote,
     editName,
     setEditName,
     editDescription,
@@ -12,9 +12,9 @@ function EditNoteForm() {
     handleCancelEdit,
     updateError,
     updateSuccess
-  } = useExamples();
+  } = useNotes();
 
-  if (!selectedExample) return null;
+  if (!selectedNote) return null;
 
   return (
     <div className="section-content">
@@ -27,7 +27,7 @@ function EditNoteForm() {
             type="text"
             value={editName}
             onChange={e => setEditName(e.target.value)}
-            disabled={selectedExample.finalized}
+            disabled={selectedNote.finalized}
             className="input-text"
           />
         </div>
@@ -38,12 +38,12 @@ function EditNoteForm() {
             type="text"
             value={editDescription}
             onChange={e => setEditDescription(e.target.value)}
-            disabled={selectedExample.finalized}
+            disabled={selectedNote.finalized}
             className="input-text"
           />
         </div>
         <div className="button-group">
-          <button type="submit" disabled={selectedExample.finalized} className="btn">Update</button>
+          <button type="submit" disabled={selectedNote.finalized} className="btn">Update</button>
           <button type="button" onClick={handleCancelEdit} className="btn btn-cancel">Cancel</button>
         </div>
         {updateError && <div className="error-message">{updateError}</div>}

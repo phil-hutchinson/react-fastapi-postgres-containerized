@@ -1,29 +1,29 @@
 import React from 'react';
-import { useExamples } from '../../hooks/useExamples';
+import { useNotes } from '../../hooks/useNotes';
 
 function NoteList() {
-  const { examples, handleSelect, examplesError, addMode, editMode } = useExamples();
+  const { notes, handleSelect, notesError, addMode, editMode } = useNotes();
   const disabled = addMode || editMode;
 
-  if (examplesError) {
-    return <div style={{color: 'red'}}>{examplesError}</div>;
+  if (notesError) {
+    return <div style={{color: 'red'}}>{notesError}</div>;
   }
-  if (examples === null) {
+  if (notes === null) {
     return <div>Loading...</div>;
   }
-  if (examples.length === 0) {
+  if (notes.length === 0) {
     return <div>No notes found.</div>;
   }
   return (
     <ul>
-      {examples.map(ex => (
-        <li key={ex.uuid}>
+      {notes.map(note => (
+        <li key={note.uuid}>
           <button
-            onClick={() => handleSelect(ex.uuid)}
+            onClick={() => handleSelect(note.uuid)}
             disabled={disabled}
             className="selection-card"
           >
-            <strong>{ex.name}</strong>
+            <strong>{note.name}</strong>
           </button>
         </li>
       ))}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExamplesProvider, useExamples } from '../../hooks/useExamples';
+import { NotesProvider, useNotes } from '../../hooks/useNotes';
 import NoteList from './NoteList';
 import AddNoteForm from './AddNoteForm';
 import EditNoteForm from './EditNoteForm';
@@ -7,26 +7,26 @@ import DisplayNoteDetails from './DisplayNoteDetails';
 
 function NotesApp() {
   return (
-    <ExamplesProvider>
+    <NotesProvider>
       <NotesAppContent />
-    </ExamplesProvider>
+    </NotesProvider>
   );
 }
 
 function NotesAppContent() {
   const {
-    selectedExample,
+    selectedNote,
     detailsError,
     editMode,
     addMode,
     handleAddClick
-  } = useExamples();
+  } = useNotes();
 
   return (
     <div className="layout-container min-h-screen flex flex-col items-center bg-gray-50">
-      <h1 className="app-title">Template: React/FastAPI/Postgres</h1>
+      <h1 className="app-title">Template App: React &ndash; Python/FastAPI &ndash; Postgres</h1>
       <div className="w-full max-w-2xl">
-        <h2 className="section-title">Notes:</h2>
+        <h2 className="section-title">Note Content:</h2>
         <NoteList />
         <button
           onClick={handleAddClick}
@@ -37,7 +37,7 @@ function NotesAppContent() {
         </button>
         {addMode ? (
           <AddNoteForm />
-        ) : selectedExample || detailsError ?
+        ) : selectedNote || detailsError ?
             editMode ? (
               <EditNoteForm />
             ) : (
