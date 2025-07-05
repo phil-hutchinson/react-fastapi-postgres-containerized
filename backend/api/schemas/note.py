@@ -13,7 +13,7 @@ class NoteDetail(BaseModel):
     uuid: str
     name: str
     description: Optional[str] = None
-    finalized: bool
+    finalized: bool  # Expose as finalized for API, but will map from 'locked' in model
 
 class NoteUpdate(BaseModel):
     name: Optional[str] = None
