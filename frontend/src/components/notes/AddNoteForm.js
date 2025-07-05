@@ -1,7 +1,7 @@
 import React from 'react';
 import { useExamples } from '../../hooks/useExamples';
 
-function AddExampleForm() {
+function AddNoteForm() {
   const {
     addName,
     setAddName,
@@ -49,4 +49,4 @@ function AddExampleForm() {
   );
 }
 
-export default AddExampleForm;
+export default AddNoteForm;

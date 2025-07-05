@@ -1,7 +1,7 @@
 import React from 'react';
 import { useExamples } from '../../hooks/useExamples';
 
-function ExampleList() {
+function NoteList() {
   const { examples, handleSelect, examplesError, addMode, editMode } = useExamples();
   const disabled = addMode || editMode;
 
@@ -31,4 +31,4 @@ function ExampleList() {
   );
 }
 
-export default ExampleList;
+export default NoteList;

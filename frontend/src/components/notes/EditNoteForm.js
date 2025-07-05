@@ -1,7 +1,7 @@
 import React from 'react';
 import { useExamples } from '../../hooks/useExamples';
 
-function EditExampleForm() {
+function EditNoteForm() {
   const {
     selectedExample,
     editName,
@@ -53,4 +53,4 @@ function EditExampleForm() {
   );
 }
 
-export default EditExampleForm;
+export default EditNoteForm;

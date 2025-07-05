@@ -1,8 +1,8 @@
 import './index.css';
-import ExamplesApp from './components/examples/ExamplesApp';
+import NotesApp from './components/notes/NotesApp';
 
 function App() {
-  return <ExamplesApp />;
+  return <NotesApp />;
 }
 
 export default App;

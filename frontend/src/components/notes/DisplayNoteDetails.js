@@ -1,7 +1,7 @@
 import React from 'react';
 import { useExamples } from '../../hooks/useExamples';
 
-function DisplayExampleDetails() {
+function DisplayNoteDetails() {
   const {
     selectedExample,
     handleEdit,
@@ -41,4 +41,4 @@ function DisplayExampleDetails() {
   );
 }
 
-export default DisplayExampleDetails;
+export default DisplayNoteDetails;

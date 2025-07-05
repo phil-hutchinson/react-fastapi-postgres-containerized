@@ -1,19 +1,19 @@
 import React from 'react';
 import { ExamplesProvider, useExamples } from '../../hooks/useExamples';
-import ExampleList from './ExampleList';
-import AddExampleForm from './AddExampleForm';
-import EditExampleForm from './EditExampleForm';
-import DisplayExampleDetails from './DisplayExampleDetails';
+import NoteList from './NoteList';
+import AddNoteForm from './AddNoteForm';
+import EditNoteForm from './EditNoteForm';
+import DisplayNoteDetails from './DisplayNoteDetails';
 
-function ExamplesApp() {
+function NotesApp() {
   return (
     <ExamplesProvider>
-      <ExamplesAppContent />
+      <NotesAppContent />
     </ExamplesProvider>
   );
 }
 
-function ExamplesAppContent() {
+function NotesAppContent() {
   const {
     selectedExample,
     detailsError,
@@ -24,10 +24,10 @@ function ExamplesAppContent() {
 
   return (
     <div className="layout-container min-h-screen flex flex-col items-center bg-gray-50">
-      <h1 className="app-title">Template App: React &ndash; FastAPI &ndash; Postgres</h1>
+      <h1 className="app-title">Template: React/FastAPI/Postgres</h1>
       <div className="w-full max-w-2xl">
-        <h2 className="section-title">Example Content:</h2>
-        <ExampleList />
+        <h2 className="section-title">Notes:</h2>
+        <NoteList />
         <button
           onClick={handleAddClick}
           disabled={addMode || editMode}
@@ -36,12 +36,12 @@ function ExamplesAppContent() {
           Add Note
         </button>
         {addMode ? (
-          <AddExampleForm />
+          <AddNoteForm />
         ) : selectedExample || detailsError ?
             editMode ? (
-              <EditExampleForm />
+              <EditNoteForm />
             ) : (
-              <DisplayExampleDetails />
+              <DisplayNoteDetails />
             )
           : null
         }
@@ -50,4 +50,4 @@ function ExamplesAppContent() {
   );
 }
 
-export default ExamplesApp;
+export default NotesApp;
