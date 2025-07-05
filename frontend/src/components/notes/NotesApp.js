@@ -24,9 +24,9 @@ function NotesAppContent() {
 
   return (
     <div className="layout-container min-h-screen flex flex-col items-center bg-gray-50">
-      <h1 className="app-title">Template App: React &ndash; Python/FastAPI &ndash; Postgres</h1>
+      <h1 className="app-title">Template App: React/FastAPI/Postgres</h1>
       <div className="w-full max-w-2xl">
-        <h2 className="section-title">Note Content:</h2>
+        <h2 className="section-title">Notes:</h2>
         <NoteList />
         <button
           onClick={handleAddClick}
