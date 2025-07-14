@@ -17,7 +17,8 @@ services:
       - ./backend:/app
     ports:
       - "8000:8000"
-      - "5678:5678"
+      - "5678:5678"  # Main app debugging
+      - "5679:5679"  # Test debugging
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
     depends_on:
@@ -35,6 +36,18 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  db_test:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_DB: testdb
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata_test:/var/lib/postgresql/data
+
   pgadmin:
     image: dpage/pgadmin4
     restart: always
@@ -50,3 +63,4 @@ services:
 
 volumes:
   pgdata:
+  pgdata_test:
