@@ -8,11 +8,11 @@ from alembic.config import Config
 from alembic import command
 import os
 
-# Debug setup for VS Code
+# Optional debug setup for VS Code - only activates when DEBUG_TESTS=true
 DEBUG_MODE = os.getenv("DEBUG_TESTS", "false").lower() == "true"
 if DEBUG_MODE:
     import debugpy
-    debugpy.listen(("0.0.0.0", 5679))  # Use a different port than your main app
+    debugpy.listen(("0.0.0.0", 5679))
     print("Waiting for debugger to attach...")
     debugpy.wait_for_client()
     print("Debugger attached!")
@@ -24,36 +24,23 @@ TestingSessionLocal = sessionmaker(bind=engine)
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_database():
-    # Run Alembic migrations to set up schema and reference data
-    import os
-    
-    # First, let's clean the database completely
-    print("Dropping all existing tables...")
+    # Clean the database completely before running migrations
     Base.metadata.drop_all(engine)
     
-    # Also drop the alembic_version table if it exists
+    # Also drop the alembic_version table if it exists to force fresh migrations
     from sqlalchemy import text
     with engine.connect() as conn:
         conn.execute(text("DROP TABLE IF EXISTS alembic_version"))
         conn.commit()
     
-    print("Setting up Alembic configuration...")
+    # Run Alembic migrations to set up schema
     alembic_ini_path = os.path.join(os.path.dirname(__file__), '..', '..', 'alembic.ini')
     alembic_cfg = Config(alembic_ini_path)
     alembic_cfg.set_main_option("sqlalchemy.url", TEST_DATABASE_URL)
     # Set the script location to absolute path so Alembic can find migrations
     script_location = os.path.join(os.path.dirname(__file__), '..', '..', 'alembic')
     alembic_cfg.set_main_option("script_location", script_location)
-    
-    print("Running Alembic migrations...")
     command.upgrade(alembic_cfg, "head")
-    print("Migrations completed!")
-    
-    # Debug: Check what tables were created
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"))
-        tables = [row[0] for row in result]
-        print(f"Tables after migration: {tables}")
     
     yield
     

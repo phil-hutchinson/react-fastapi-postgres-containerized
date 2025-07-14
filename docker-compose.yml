@@ -18,7 +18,7 @@ services:
     ports:
       - "8000:8000"
       - "5678:5678"  # Main app debugging
-      - "5679:5679"  # Test debugging
+      - "5679:5679"  # Test debugging (only used when DEBUG_TESTS=true)
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
     depends_on:
