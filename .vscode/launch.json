@@ -15,6 +15,21 @@
           "remoteRoot": "/app"
         }
       ]
+    },
+    {
+      "name": "Python: Test Debugger (Docker)",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 5679
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/backend",
+          "remoteRoot": "/app"
+        }
+      ]
     }
   ]
 }
