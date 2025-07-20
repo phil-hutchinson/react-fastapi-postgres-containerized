@@ -6,3 +6,4 @@ alembic
 pytest
 httpx
 debugpy
+prometheus-fastapi-instrumentator

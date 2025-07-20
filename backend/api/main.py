@@ -1,19 +1,13 @@
+
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from api.services import note as note_router
+from api.middleware import setup_cors, setup_metrics
 
 def create_app():
     app = FastAPI()
 
-    # Allow CORS for all origins (development only)
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-
+    setup_cors(app)
+    setup_metrics(app)
     app.include_router(note_router.router)
 
     @app.get("/")
