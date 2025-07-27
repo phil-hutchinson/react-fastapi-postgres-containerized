@@ -6,6 +6,10 @@ DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@db:5432
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# OpenTelemetry SQLAlchemy tracing instrumentation
+from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+SQLAlchemyInstrumentor().instrument(engine=engine)
+
 def get_db():
     db = SessionLocal()
     try:

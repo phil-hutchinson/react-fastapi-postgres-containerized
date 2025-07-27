@@ -11,6 +11,9 @@ def create_app():
     # OpenTelemetry metrics setup
     from api.otel_setup import setup_otel_metrics
     setup_otel_metrics()
+    # OpenTelemetry tracing setup
+    from api.otel_setup import setup_otel_tracing
+    setup_otel_tracing()
     app.include_router(note_router.router)
 
     @app.get("/")

@@ -62,7 +62,7 @@ services:
       - ./servers.json:/pgadmin4/servers.json
 
   otel-collector:
-    image: otel/opentelemetry-collector:latest
+    image: otel/opentelemetry-collector-contrib:latest
     container_name: otel-collector
     volumes:
       - ./monitoring/otel-collector/otel-collector-config.yml:/etc/otelcol/config.yml
@@ -96,6 +96,13 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     depends_on:
       - prometheus
+
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    ports:
+      - "9411:9411"
 
 volumes:
   pgdata:

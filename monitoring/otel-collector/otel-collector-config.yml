@@ -9,8 +9,15 @@ exporters:
     endpoint: "0.0.0.0:9464"
     namespace: "otelcol"
 
+  zipkin:
+    endpoint: "http://zipkin:9411/api/v2/spans"
+
 service:
   pipelines:
     metrics:
       receivers: [otlp]
       exporters: [prometheus]
+
+    traces:
+      receivers: [otlp]
+      exporters: [zipkin]
