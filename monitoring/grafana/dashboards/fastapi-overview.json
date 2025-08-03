@@ -1,51 +1,158 @@
 {
   "id": null,
   "uid": "fastapi-overview",
-  "title": "FastAPI Overview",
-  "tags": ["fastapi", "prometheus"],
+  "title": "FastAPI OpenTelemetry Overview",
+  "tags": ["fastapi", "opentelemetry", "prometheus"],
   "timezone": "browser",
   "schemaVersion": 30,
   "version": 1,
   "refresh": "10s",
   "panels": [
     {
-      "type": "graph",
-      "title": "Average Request Duration (seconds)",
+      "type": "timeseries",
+      "title": "Average Request Duration (milliseconds)",
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "http_request_duration_seconds_sum / http_request_duration_seconds_count",
-          "legendFormat": "Average Duration",
+          "expr": "rate(otelcol_http_server_duration_milliseconds_sum[5m]) / rate(otelcol_http_server_duration_milliseconds_count[5m])",
+          "legendFormat": "{{http_method}} {{http_target}} ({{http_status_code}})",
           "interval": ""
         }
       ],
-      "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}
+      "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        }
+      }
     },
     {
-      "type": "graph",
-      "title": "Requests per Endpoint",
+      "type": "timeseries",
+      "title": "Request Rate (requests/sec)",
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "sum by (handler) (http_requests_total)",
-          "legendFormat": "{{handler}}",
+          "expr": "sum by (http_method, http_target, http_status_code) (rate(otelcol_http_server_duration_milliseconds_count[5m]))",
+          "legendFormat": "{{http_method}} {{http_target}} ({{http_status_code}})",
           "interval": ""
         }
       ],
-      "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}
+      "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        }
+      }
     },
     {
-      "type": "graph",
-      "title": "95th Percentile Request Duration (seconds)",
+      "type": "timeseries",
+      "title": "95th Percentile Request Duration",
       "datasource": "Prometheus",
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, handler))",
-          "legendFormat": "{{handler}}",
+          "expr": "histogram_quantile(0.95, sum(rate(otelcol_http_server_duration_milliseconds_bucket[5m])) by (le, http_method, http_target))",
+          "legendFormat": "{{http_method}} {{http_target}}",
           "interval": ""
         }
       ],
-      "gridPos": {"x": 0, "y": 8, "w": 24, "h": 8}
+      "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Database Connection Pool Usage",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "otelcol_db_client_connections_usage",
+          "legendFormat": "{{state}} connections",
+          "interval": ""
+        }
+      ],
+      "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Total Requests",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(otelcol_http_server_duration_milliseconds_count)",
+          "legendFormat": "Total",
+          "interval": ""
+        }
+      ],
+      "gridPos": {"x": 0, "y": 16, "w": 6, "h": 4},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Error Rate",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(rate(otelcol_http_server_duration_milliseconds_count{http_status_code=~\"5..\"}[5m])) / sum(rate(otelcol_http_server_duration_milliseconds_count[5m])) * 100",
+          "legendFormat": "Error %",
+          "interval": ""
+        }
+      ],
+      "gridPos": {"x": 6, "y": 16, "w": 6, "h": 4},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "max": 100,
+          "min": 0
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Average Response Size",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "rate(otelcol_http_server_response_size_bytes_sum[5m]) / rate(otelcol_http_server_response_size_bytes_count[5m])",
+          "legendFormat": "Avg Size",
+          "interval": ""
+        }
+      ],
+      "gridPos": {"x": 12, "y": 16, "w": 6, "h": 4},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Active Requests",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(otelcol_http_server_active_requests)",
+          "legendFormat": "Active",
+          "interval": ""
+        }
+      ],
+      "gridPos": {"x": 18, "y": 16, "w": 6, "h": 4},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
     }
   ]
 }

@@ -6,3 +6,9 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
     volumes:
       - ./backend:/app
+    networks:
+      - react-fastapi-postgres_default
+
+networks:
+  react-fastapi-postgres_default:
+    external: true

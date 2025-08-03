@@ -11,6 +11,9 @@ from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExport
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry import trace
 
+# HTTP instrumentation imports
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+
 def setup_otel_metrics():
     otlp_exporter = OTLPMetricExporter(endpoint="http://otel-collector:4318/v1/metrics")
     reader = PeriodicExportingMetricReader(otlp_exporter)
@@ -25,3 +28,11 @@ def setup_otel_tracing():
     span_processor = BatchSpanProcessor(trace_exporter)
     tracer_provider.add_span_processor(span_processor)
     trace.set_tracer_provider(tracer_provider)
+
+
+def setup_otel_http_instrumentation(app):
+    """
+    Sets up OpenTelemetry HTTP instrumentation for FastAPI.
+    This replaces the Prometheus FastAPI Instrumentator.
+    """
+    FastAPIInstrumentor.instrument_app(app)

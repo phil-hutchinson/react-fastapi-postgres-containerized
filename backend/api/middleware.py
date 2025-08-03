@@ -1,6 +1,5 @@
 
 from fastapi.middleware.cors import CORSMiddleware
-from prometheus_fastapi_instrumentator import Instrumentator
 
 def setup_cors(app):
     """
@@ -13,9 +12,3 @@ def setup_cors(app):
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
-def setup_metrics(app):
-    """
-    Adds Prometheus metrics middleware to the FastAPI app.
-    """
-    Instrumentator().instrument(app).expose(app)
