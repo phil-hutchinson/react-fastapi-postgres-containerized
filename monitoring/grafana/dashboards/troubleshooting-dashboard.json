@@ -45,28 +45,44 @@
       }
     },
     {
-      "type": "traces",
-      "title": "Recent Traces (Zipkin)",
+      "type": "table",
+      "title": "Recent Traces (Tempo)",
       "datasource": {
-        "type": "zipkin",
-        "uid": "zipkin"
+        "type": "tempo",
+        "uid": "tempo"
       },
       "targets": [
         {
           "queryType": "search",
-          "serviceName": "unknown_service",
-          "operationName": "",
-          "tags": [],
-          "minDuration": "1s",
-          "maxDuration": "",
-          "limit": 10,
+          "query": "",
+          "limit": 20,
           "refId": "A"
         }
       ],
       "gridPos": {"x": 0, "y": 8, "w": 24, "h": 10},
-      "options": {
-        "showTime": true
-      }
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "renameByName": {
+              "traceID": "Trace ID",
+              "rootServiceName": "Service",
+              "rootTraceName": "Operation",
+              "durationMs": "Duration (ms)",
+              "startTimeUnixNano": "Start Time"
+            }
+          }
+        }
+      ]
     },
     {
       "type": "table",

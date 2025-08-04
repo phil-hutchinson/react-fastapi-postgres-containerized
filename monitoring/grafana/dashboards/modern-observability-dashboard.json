@@ -1,0 +1,273 @@
+{
+  "id": null,
+  "uid": "modern-observability-dashboard",
+  "title": "Modern Observability Dashboard",
+  "tags": ["observability", "tempo", "prometheus", "fastapi"],
+  "timezone": "browser",
+  "schemaVersion": 30,
+  "version": 1,
+  "refresh": "10s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Request Rate",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(rate(otelcol_http_server_duration_milliseconds_count[5m]))",
+          "legendFormat": "Requests/sec",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Average Response Time",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "rate(otelcol_http_server_duration_milliseconds_sum[5m]) / rate(otelcol_http_server_duration_milliseconds_count[5m])",
+          "legendFormat": "Avg Response Time",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 6, "y": 0, "w": 6, "h": 4},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Error Rate",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(rate(otelcol_http_server_duration_milliseconds_count{http_status_code=~\"5..\"}[5m])) / sum(rate(otelcol_http_server_duration_milliseconds_count[5m])) * 100",
+          "legendFormat": "Error %",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 12, "y": 0, "w": 6, "h": 4},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "red", "value": 5}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Active Database Connections",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(otelcol_db_client_connections_usage)",
+          "legendFormat": "DB Connections",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 18, "y": 0, "w": 6, "h": 4},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Request Duration Percentiles",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(otelcol_http_server_duration_milliseconds_bucket[5m])) by (le))",
+          "legendFormat": "50th percentile",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(otelcol_http_server_duration_milliseconds_bucket[5m])) by (le))",
+          "legendFormat": "95th percentile",
+          "refId": "B"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(otelcol_http_server_duration_milliseconds_bucket[5m])) by (le))",
+          "legendFormat": "99th percentile",
+          "refId": "C"
+        }
+      ],
+      "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Request Rate by Endpoint",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(rate(otelcol_http_server_duration_milliseconds_count[5m])) by (http_target, http_method)",
+          "legendFormat": "{{http_method}} {{http_target}}",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "table",
+      "title": "Recent Traces",
+      "datasource": "Tempo",
+      "targets": [
+        {
+          "queryType": "search",
+          "refId": "A",
+          "limit": 20
+        }
+      ],
+      "gridPos": {"x": 0, "y": 12, "w": 24, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table"
+          }
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "renameByName": {
+              "traceID": "Trace ID",
+              "rootServiceName": "Service",
+              "rootTraceName": "Operation",
+              "durationMs": "Duration (ms)"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "Slowest Operations (>1s)",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum by (http_method, http_target) (increase(otelcol_http_server_duration_milliseconds_bucket{le=\"+Inf\"}[5m]) - increase(otelcol_http_server_duration_milliseconds_bucket{le=\"1000\"}[5m]))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 0, "y": 20, "w": 12, "h": 6},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table"
+          }
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "http_method": "Method",
+              "http_target": "Endpoint",
+              "Value": "Slow Requests"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "table",
+      "title": "Database Operations",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum by (db_operation_name) (rate(otelcol_db_client_operation_duration_milliseconds_count[5m]))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 12, "y": 20, "w": 12, "h": 6},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table"
+          }
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "db_operation_name": "Database Operation",
+              "Value": "Ops/sec"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
