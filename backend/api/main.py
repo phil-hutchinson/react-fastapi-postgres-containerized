@@ -1,6 +1,7 @@
 
 from fastapi import FastAPI
 from api.services import note as note_router
+from api.services import simulation as simulation_router
 from api.middleware import setup_cors
 
 def create_app():
@@ -18,6 +19,7 @@ def create_app():
     setup_otel_http_instrumentation(app)
     
     app.include_router(note_router.router)
+    app.include_router(simulation_router.router)
 
     @app.get("/")
     def read_root():

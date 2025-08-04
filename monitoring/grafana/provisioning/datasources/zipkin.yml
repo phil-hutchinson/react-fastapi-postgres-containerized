@@ -1,0 +1,29 @@
+apiVersion: 1
+datasources:
+  - name: Zipkin
+    type: zipkin
+    uid: zipkin
+    url: http://zipkin:9411
+    access: proxy
+    isDefault: false
+    editable: true
+    jsonData:
+      nodeGraph:
+        enabled: true
+      tracesToLogs:
+        datasourceUid: 'loki'
+        filterByTraceID: true
+        filterBySpanID: false
+        tags: []
+      tracesToMetrics:
+        datasourceUid: 'prometheus'
+        tags: [
+          { key: 'service.name', value: 'service' },
+          { key: 'http.method', value: 'method' },
+          { key: 'http.target', value: 'endpoint' }
+        ]
+        queries:
+          - name: 'Request rate'
+            query: 'sum(rate(otelcol_http_server_duration_milliseconds_count{service="$service",method="$method",endpoint="$endpoint"}[5m]))'
+          - name: 'Request duration'
+            query: 'histogram_quantile(0.9, sum(rate(otelcol_http_server_duration_milliseconds_bucket{service="$service",method="$method",endpoint="$endpoint"}[5m])) by (le))'
