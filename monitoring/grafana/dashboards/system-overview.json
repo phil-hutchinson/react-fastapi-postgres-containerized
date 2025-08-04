@@ -1,0 +1,148 @@
+{
+  "id": null,
+  "uid": "system-overview",
+  "title": "System Overview (OpenTelemetry)",
+  "tags": ["system", "overview", "opentelemetry"],
+  "timezone": "browser",
+  "schemaVersion": 30,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Service Status",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "up",
+          "legendFormat": "{{job}}",
+          "interval": ""
+        }
+      ],
+      "gridPos": {"x": 0, "y": 0, "w": 24, "h": 3},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "mappings": [
+            {
+              "options": {
+                "0": {"text": "DOWN", "color": "red"},
+                "1": {"text": "UP", "color": "green"}
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP Request Volume",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(rate(otelcol_http_server_duration_milliseconds_count[5m]))",
+          "legendFormat": "Requests/sec",
+          "interval": ""
+        }
+      ],
+      "gridPos": {"x": 0, "y": 3, "w": 8, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Response Time Distribution",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(otelcol_http_server_duration_milliseconds_bucket[5m])) by (le))",
+          "legendFormat": "50th percentile",
+          "interval": ""
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(otelcol_http_server_duration_milliseconds_bucket[5m])) by (le))",
+          "legendFormat": "95th percentile",
+          "interval": ""
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(otelcol_http_server_duration_milliseconds_bucket[5m])) by (le))",
+          "legendFormat": "99th percentile",
+          "interval": ""
+        }
+      ],
+      "gridPos": {"x": 8, "y": 3, "w": 8, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP Status Codes",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum by (http_status_code) (rate(otelcol_http_server_duration_milliseconds_count[5m]))",
+          "legendFormat": "{{http_status_code}}",
+          "interval": ""
+        }
+      ],
+      "gridPos": {"x": 16, "y": 3, "w": 8, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Request and Response Sizes",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "rate(otelcol_http_server_request_size_bytes_sum[5m]) / rate(otelcol_http_server_request_size_bytes_count[5m])",
+          "legendFormat": "Avg Request Size",
+          "interval": ""
+        },
+        {
+          "expr": "rate(otelcol_http_server_response_size_bytes_sum[5m]) / rate(otelcol_http_server_response_size_bytes_count[5m])",
+          "legendFormat": "Avg Response Size",
+          "interval": ""
+        }
+      ],
+      "gridPos": {"x": 0, "y": 11, "w": 12, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Database Activity",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "otelcol_db_client_connections_usage{state=\"used\"}",
+          "legendFormat": "Active DB Connections",
+          "interval": ""
+        },
+        {
+          "expr": "otelcol_db_client_connections_usage{state=\"idle\"}",
+          "legendFormat": "Idle DB Connections",
+          "interval": ""
+        }
+      ],
+      "gridPos": {"x": 12, "y": 11, "w": 12, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    }
+  ]
+}

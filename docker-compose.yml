@@ -61,6 +61,53 @@ services:
     volumes:
       - ./servers.json:/pgadmin4/servers.json
 
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    volumes:
+      - ./monitoring/otel-collector/otel-collector-config.yml:/etc/otelcol/config.yml
+    ports:
+      - "4318:4318"   # OTLP HTTP receiver
+      - "9464:9464"   # Prometheus metrics exporter
+    command: ["--config", "/etc/otelcol/config.yml"]
+    depends_on:
+      - backend
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - backend
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    depends_on:
+      - prometheus
+
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    ports:
+      - "3200:3200"   # Tempo HTTP API
+      - "4317:4317"   # OTLP gRPC receiver
+    volumes:
+      - ./monitoring/tempo/tempo.yml:/etc/tempo/tempo.yml
+    command: ["-config.file=/etc/tempo/tempo.yml"]
+
 volumes:
   pgdata:
   pgdata_test:

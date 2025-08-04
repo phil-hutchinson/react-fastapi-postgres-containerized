@@ -1,0 +1,170 @@
+{
+  "id": null,
+  "uid": "troubleshooting-dashboard",
+  "title": "Troubleshooting Dashboard (Metrics → Traces)",
+  "tags": ["troubleshooting", "tracing", "metrics"],
+  "timezone": "browser",
+  "schemaVersion": 30,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Request Duration with Trace Links",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(otelcol_http_server_duration_milliseconds_bucket[5m])) by (le, http_target, http_method))",
+          "legendFormat": "95th percentile - {{http_method}} {{http_target}}",
+          "interval": ""
+        },
+        {
+          "expr": "rate(otelcol_http_server_duration_milliseconds_sum[5m]) / rate(otelcol_http_server_duration_milliseconds_count[5m])",
+          "legendFormat": "Average - {{http_method}} {{http_target}}",
+          "interval": ""
+        }
+      ],
+      "gridPos": {"x": 0, "y": 0, "w": 24, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 1000},
+              {"color": "red", "value": 3000}
+            ]
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "type": "table",
+      "title": "Recent Traces (Tempo)",
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "targets": [
+        {
+          "queryType": "search",
+          "query": "",
+          "limit": 20,
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x": 0, "y": 8, "w": 24, "h": 10},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "renameByName": {
+              "traceID": "Trace ID",
+              "rootServiceName": "Service",
+              "rootTraceName": "Operation",
+              "durationMs": "Duration (ms)",
+              "startTimeUnixNano": "Start Time"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Slow Requests Summary (>2s)",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum by (http_method, http_target, http_status_code) (increase(otelcol_http_server_duration_milliseconds_bucket{le=\"+Inf\"}[5m]) - increase(otelcol_http_server_duration_milliseconds_bucket{le=\"2000\"}[5m]))",
+          "legendFormat": "{{http_method}} {{http_target}} ({{http_status_code}})",
+          "interval": "",
+          "format": "table",
+          "instant": true
+        }
+      ],
+      "gridPos": {"x": 0, "y": 18, "w": 12, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "http_method": "Method",
+              "http_target": "Endpoint", 
+              "http_status_code": "Status",
+              "Value": "Slow Requests"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Error Requests Summary",
+      "datasource": "Prometheus", 
+      "targets": [
+        {
+          "expr": "sum by (http_method, http_target, http_status_code) (increase(otelcol_http_server_duration_milliseconds_count{http_status_code=~\"5..\"}[5m]))",
+          "legendFormat": "{{http_method}} {{http_target}} ({{http_status_code}})", 
+          "interval": "",
+          "format": "table",
+          "instant": true
+        }
+      ],
+      "gridPos": {"x": 12, "y": 18, "w": 12, "h": 8},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "http_method": "Method",
+              "http_target": "Endpoint",
+              "http_status_code": "Status", 
+              "Value": "Error Count"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  }
+}
