@@ -91,7 +91,7 @@ def update_note(uuid: str, update: NoteUpdate, db: Session = Depends(get_db)):
         logger.error(f"Unexpected error while updating note {uuid}: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.put("/{uuid}/lock", response_model=NoteDetail)
+@router.post("/{uuid}/actions/lock", response_model=NoteDetail)
 def lock_note(uuid: str, db: Session = Depends(get_db)):
     logger.info(f"Locking note with UUID: {uuid}")
     try:

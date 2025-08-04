@@ -101,7 +101,7 @@ function useNotesProvider() {
     setLockSuccess(null);
     if (!selectedNote || selectedNote.locked) return;
     if (window.confirm('Are you sure you want to lock this note? This action cannot be undone.')) {
-      axios.put(`http://localhost:8000/notes/${selectedNote.uuid}/lock`)
+      axios.post(`http://localhost:8000/notes/${selectedNote.uuid}/actions/lock`)
         .then(res => {
           setSelectedNote(res.data);
           setLockSuccess('Note locked successfully!');

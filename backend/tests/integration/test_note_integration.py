@@ -167,7 +167,7 @@ class TestNoteIntegration:
         note_uuid = create_response.json()["uuid"]
         
         # Lock the note
-        client.put(f"/notes/{note_uuid}/lock")
+        client.post(f"/notes/{note_uuid}/actions/lock")
         
         update_payload = {"name": "Should Not Update", "description": "Should not change"}
         
@@ -208,7 +208,7 @@ class TestNoteIntegration:
         note_uuid = create_response.json()["uuid"]
         
         # Act
-        response = client.put(f"/notes/{note_uuid}/lock")
+        response = client.post(f"/notes/{note_uuid}/actions/lock")
         
         # Assert
         assert response.status_code == 200
