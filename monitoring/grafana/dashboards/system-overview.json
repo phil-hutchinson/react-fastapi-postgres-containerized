@@ -143,6 +143,36 @@
           "unit": "short"
         }
       }
+    },
+    {
+      "type": "logs",
+      "title": "Recent Error Logs (Last 20)",
+      "datasource": "Loki",
+      "targets": [
+        {
+          "expr": "{service_name=\"backend\"} |= \"ERROR\"",
+          "refId": "A",
+          "maxLines": 20
+        }
+      ],
+      "gridPos": {"x": 0, "y": 19, "w": 24, "h": 10},
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "list"
+          }
+        }
+      }
     }
   ]
 }
