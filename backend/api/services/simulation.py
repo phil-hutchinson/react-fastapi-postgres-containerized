@@ -7,6 +7,10 @@ import time
 import random
 import asyncio
 from datetime import datetime
+import logging
+
+# Get logger for this module
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/simulation", tags=["simulation"])
 
@@ -19,24 +23,32 @@ def simulate_slow_response(delay: int = None, db: Session = Depends(get_db)):
     if delay is None:
         delay = random.randint(2, 5)
     
+    logger.info(f"Starting slow response simulation with {delay}s delay")
     start_time = time.time()
     
     # Simulate slow database operation
     time.sleep(delay)
     
-    # Perform actual database query to generate realistic telemetry
-    note_count = db.query(Note).count()
-    
-    end_time = time.time()
-    actual_delay = round(end_time - start_time, 2)
-    
-    return {
-        "message": f"Simulated slow operation completed",
-        "requested_delay": delay,
-        "actual_delay": actual_delay,
-        "note_count": note_count,
-        "timestamp": datetime.now().isoformat()
-    }
+    try:
+        # Perform actual database query to generate realistic telemetry
+        note_count = db.query(Note).count()
+        
+        end_time = time.time()
+        actual_delay = round(end_time - start_time, 2)
+        
+        result = {
+            "message": f"Simulated slow operation completed",
+            "requested_delay": delay,
+            "actual_delay": actual_delay,
+            "note_count": note_count,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        logger.info(f"Slow response simulation completed: {actual_delay}s delay, {note_count} notes")
+        return result
+    except Exception as e:
+        logger.error(f"Error in slow response simulation: {str(e)}")
+        raise HTTPException(status_code=500, detail="Simulation error")
 
 @router.get("/error", response_model=Dict[str, Any])
 def simulate_error(error_rate: float = 0.5, db: Session = Depends(get_db)):
@@ -44,6 +56,8 @@ def simulate_error(error_rate: float = 0.5, db: Session = Depends(get_db)):
     Generates random errors based on error_rate (0.0-1.0).
     Default 50% chance of error.
     """
+    logger.info(f"Starting error simulation with error rate: {error_rate}")
+    
     if random.random() < error_rate:
         error_type = random.choice([
             "database_connection",
@@ -66,19 +80,26 @@ def simulate_error(error_rate: float = 0.5, db: Session = Depends(get_db)):
             "timeout": 504
         }
         
+        logger.error(f"Simulated error triggered: {error_type} - {error_messages[error_type]}")
         raise HTTPException(
             status_code=status_codes[error_type],
             detail=error_messages[error_type]
         )
     
-    # Success case
-    note_count = db.query(Note).count()
-    return {
-        "message": "Operation successful (no error this time)",
-        "error_rate": error_rate,
-        "note_count": note_count,
-        "timestamp": datetime.now().isoformat()
-    }
+    try:
+        # Success case - perform actual database operation
+        note_count = db.query(Note).count()
+        result = {
+            "message": "Error simulation passed - no error generated",
+            "error_rate": error_rate,
+            "note_count": note_count,
+            "timestamp": datetime.now().isoformat()
+        }
+        logger.info(f"Error simulation completed successfully with {note_count} notes")
+        return result
+    except Exception as e:
+        logger.error(f"Unexpected error in error simulation: {str(e)}")
+        raise HTTPException(status_code=500, detail="Simulation error")
 
 @router.get("/memory", response_model=Dict[str, Any])
 def simulate_memory_intensive(size_mb: int = None):
@@ -89,6 +110,7 @@ def simulate_memory_intensive(size_mb: int = None):
     if size_mb is None:
         size_mb = random.randint(10, 50)
     
+    logger.info(f"Starting memory simulation with {size_mb}MB allocation")
     start_time = time.time()
     
     # Simulate memory allocation
@@ -104,18 +126,25 @@ def simulate_memory_intensive(size_mb: int = None):
         # Clean up
         del data
         
-    except MemoryError:
+        end_time = time.time()
+        duration = round(end_time - start_time, 2)
+        
+        result = {
+            "message": f"Memory operation completed",
+            "allocated_mb": size_mb,
+            "duration": duration,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        logger.info(f"Memory simulation completed: {size_mb}MB allocated in {duration}s")
+        return result
+        
+    except MemoryError as e:
+        logger.error(f"Memory error in simulation with {size_mb}MB: {str(e)}")
         raise HTTPException(status_code=507, detail="Insufficient memory")
-    
-    end_time = time.time()
-    duration = round(end_time - start_time, 2)
-    
-    return {
-        "message": f"Memory operation completed",
-        "allocated_mb": size_mb,
-        "duration": duration,
-        "timestamp": datetime.now().isoformat()
-    }
+    except Exception as e:
+        logger.error(f"Unexpected error in memory simulation: {str(e)}")
+        raise HTTPException(status_code=500, detail="Memory simulation error")
 
 @router.get("/database-load", response_model=Dict[str, Any])
 def simulate_database_load(queries: int = None, db: Session = Depends(get_db)):
@@ -126,37 +155,46 @@ def simulate_database_load(queries: int = None, db: Session = Depends(get_db)):
     if queries is None:
         queries = random.randint(10, 50)
     
+    logger.info(f"Starting database load simulation with {queries} queries")
     start_time = time.time()
     results = []
     
-    for i in range(queries):
-        # Mix of different query types to stress the database
-        if i % 3 == 0:
-            # Count query
-            count = db.query(Note).count()
-            results.append(f"count_{i}: {count}")
-        elif i % 3 == 1:
-            # Order by query
-            notes = db.query(Note).order_by(Note.id.desc()).limit(5).all()
-            results.append(f"ordered_{i}: {len(notes)} notes")
-        else:
-            # Filter query
-            notes = db.query(Note).filter(Note.locked == False).all()
-            results.append(f"filtered_{i}: {len(notes)} unlocked notes")
+    try:
+        for i in range(queries):
+            # Mix of different query types to stress the database
+            if i % 3 == 0:
+                # Count query
+                count = db.query(Note).count()
+                results.append(f"count_{i}: {count}")
+            elif i % 3 == 1:
+                # Order by query
+                notes = db.query(Note).order_by(Note.id.desc()).limit(5).all()
+                results.append(f"ordered_{i}: {len(notes)} notes")
+            else:
+                # Filter query
+                notes = db.query(Note).filter(Note.locked == False).all()
+                results.append(f"filtered_{i}: {len(notes)} unlocked notes")
+            
+            # Small delay between queries
+            time.sleep(0.1)
         
-        # Small delay between queries
-        time.sleep(0.1)
-    
-    end_time = time.time()
-    duration = round(end_time - start_time, 2)
-    
-    return {
-        "message": f"Database load test completed",
-        "queries_executed": queries,
-        "duration": duration,
-        "sample_results": results[:5],  # First 5 results
-        "timestamp": datetime.now().isoformat()
-    }
+        end_time = time.time()
+        duration = round(end_time - start_time, 2)
+        
+        result = {
+            "message": f"Database load test completed",
+            "queries_executed": queries,
+            "duration": duration,
+            "sample_results": results[:5],  # First 5 results
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        logger.info(f"Database load simulation completed: {queries} queries in {duration}s")
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error in database load simulation: {str(e)}")
+        raise HTTPException(status_code=500, detail="Database load simulation error")
 
 @router.get("/timeout", response_model=Dict[str, Any])
 def simulate_timeout(timeout_chance: float = 0.3):
@@ -164,19 +202,32 @@ def simulate_timeout(timeout_chance: float = 0.3):
     Simulates connection timeouts.
     Use ?timeout_chance=X (0.0-1.0) to set timeout probability (default: 30%)
     """
-    if random.random() < timeout_chance:
-        # Simulate a very long operation that would timeout
-        time.sleep(10)  # This will likely cause a timeout in most clients
-        return {"message": "This shouldn't be reached due to timeout"}
+    logger.info(f"Starting timeout simulation with {timeout_chance} chance")
     
-    # Normal operation
-    time.sleep(random.uniform(0.5, 2.0))  # Some normal delay
-    
-    return {
-        "message": "Operation completed without timeout",
-        "timeout_chance": timeout_chance,
-        "timestamp": datetime.now().isoformat()
-    }
+    try:
+        if random.random() < timeout_chance:
+            logger.warning(f"Timeout simulation triggered - sleeping for 10s")
+            # Simulate a very long operation that would timeout
+            time.sleep(10)  # This will likely cause a timeout in most clients
+            return {"message": "This shouldn't be reached due to timeout"}
+        
+        # Normal operation
+        delay = random.uniform(0.5, 2.0)
+        time.sleep(delay)  # Some normal delay
+        
+        result = {
+            "message": "Operation completed without timeout",
+            "timeout_chance": timeout_chance,
+            "actual_delay": round(delay, 2),
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        logger.info(f"Timeout simulation completed successfully with {delay:.2f}s delay")
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error in timeout simulation: {str(e)}")
+        raise HTTPException(status_code=500, detail="Timeout simulation error")
 
 @router.get("/random", response_model=Dict[str, Any])
 def simulate_random_behavior(db: Session = Depends(get_db)):
@@ -184,6 +235,8 @@ def simulate_random_behavior(db: Session = Depends(get_db)):
     Randomly selects one of the above simulation behaviors.
     Useful for generating varied telemetry data.
     """
+    logger.info("Starting random behavior simulation")
+    
     behaviors = [
         ("slow", lambda: simulate_slow_response(db=db)),
         ("error", lambda: simulate_error(db=db)),
@@ -193,16 +246,18 @@ def simulate_random_behavior(db: Session = Depends(get_db)):
     ]
     
     behavior_name, behavior_func = random.choice(behaviors)
+    logger.info(f"Random simulation selected: {behavior_name}")
     
     try:
         result = behavior_func()
         result["simulation_type"] = behavior_name
+        logger.info(f"Random simulation completed successfully: {behavior_name}")
         return result
+    except HTTPException as e:
+        logger.warning(f"HTTP exception in random simulation ({behavior_name}): {e.detail}")
+        raise e  # Re-raise HTTP exceptions
     except Exception as e:
-        # Re-raise HTTP exceptions
-        if isinstance(e, HTTPException):
-            raise e
-        # Handle other exceptions
+        logger.error(f"Unexpected error in random simulation ({behavior_name}): {str(e)}")
         raise HTTPException(status_code=500, detail=f"Random simulation error: {str(e)}")
 
 @router.get("/status", response_model=Dict[str, Any])
@@ -210,6 +265,7 @@ def simulation_status():
     """
     Returns information about available simulation endpoints.
     """
+    logger.info("Simulation status endpoint accessed")
     return {
         "message": "Simulation service is running",
         "available_endpoints": {

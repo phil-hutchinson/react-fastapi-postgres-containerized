@@ -3,6 +3,8 @@ receivers:
     protocols:
       http:
         endpoint: 0.0.0.0:4318
+      grpc:
+        endpoint: 0.0.0.0:4317
 
 exporters:
   prometheus:
@@ -14,6 +16,16 @@ exporters:
     tls:
       insecure: true
 
+  loki:
+    endpoint: "http://loki:3100/loki/api/v1/push"
+    default_labels_enabled:
+      exporter: false
+      job: true
+
+  # Console exporter for debugging logs (replaces deprecated logging exporter)
+  debug:
+    verbosity: detailed
+
 service:
   pipelines:
     metrics:
@@ -23,3 +35,7 @@ service:
     traces:
       receivers: [otlp]
       exporters: [otlp]
+
+    logs:
+      receivers: [otlp]
+      exporters: [loki, debug]

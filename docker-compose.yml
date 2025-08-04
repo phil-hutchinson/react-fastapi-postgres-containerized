@@ -67,6 +67,7 @@ services:
     volumes:
       - ./monitoring/otel-collector/otel-collector-config.yml:/etc/otelcol/config.yml
     ports:
+      - "4319:4317"   # OTLP gRPC receiver (avoid conflict with tempo)
       - "4318:4318"   # OTLP HTTP receiver
       - "9464:9464"   # Prometheus metrics exporter
     command: ["--config", "/etc/otelcol/config.yml"]
@@ -107,6 +108,15 @@ services:
     volumes:
       - ./monitoring/tempo/tempo.yml:/etc/tempo/tempo.yml
     command: ["-config.file=/etc/tempo/tempo.yml"]
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"   # Loki HTTP API
+    volumes:
+      - ./monitoring/loki/loki.yml:/etc/loki/loki.yml
+    command: ["-config.file=/etc/loki/loki.yml"]
 
 volumes:
   pgdata:
