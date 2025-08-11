@@ -98,6 +98,17 @@ services:
     depends_on:
       - prometheus
 
+  dev-oidc:
+    build: ./auth/dev-oidc
+    container_name: dev-oidc
+    ports:
+      - "8088:8088"
+    environment:
+      - OIDC_ISSUER=http://dev-oidc:8088
+      - OIDC_REDIRECT_URI=http://frontend:3000/callback
+    depends_on:
+      - backend
+
 
   tempo:
     image: grafana/tempo:latest
