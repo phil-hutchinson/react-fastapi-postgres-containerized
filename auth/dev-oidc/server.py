@@ -5,10 +5,20 @@ from typing import List, Optional
 from urllib.parse import urlencode
 
 from fastapi import FastAPI, Request, Form
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse
 from jose import jwt
 
 app = FastAPI(title="Dev OIDC")
+
+# Enable CORS for the frontend (dev-only)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"]
+)
 
 # In dev only. Do not use in prod.
 ISSUER = "http://localhost:8088"
