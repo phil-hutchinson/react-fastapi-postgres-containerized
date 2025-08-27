@@ -1,13 +1,26 @@
 services:
+  # Reverse proxy and dashboard
+  nginx:
+    build: ./nginx
+    ports:
+      - "1111:80"  # Main entry point
+    depends_on:
+      - frontend
+      - backend
+      - pgadmin
+      - grafana
+      - prometheus
+
   frontend:
     build: ./frontend
-    ports:
-      - "3000:3000"
+    # Remove external port mapping - access through nginx
     volumes:
       - ./frontend:/app
       - /app/node_modules
     environment:
       - WATCHPACK_POLLING=true
+      - REACT_APP_API_BASE_URL=/api  # Now relative to nginx proxy
+      - WDS_SOCKET_PORT=1111  # WebSocket through nginx
     depends_on:
       - backend
 
@@ -15,8 +28,9 @@ services:
     build: ./backend
     volumes:
       - ./backend:/app
+    # Remove external port mapping - access through nginx
+    # Keep debug ports for development
     ports:
-      - "8000:8000"
       - "5678:5678"  # Main app debugging
       - "5679:5679"  # Test debugging (only used when DEBUG_TESTS=true)
     environment:
@@ -55,8 +69,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
       PGADMIN_CONFIG_X_FRAME_OPTIONS: "'ALLOWALL'"
-    ports:
-      - "5050:80"
+    # Remove external port mapping - access through nginx
     depends_on:
       - db
     volumes:
@@ -80,16 +93,22 @@ services:
     container_name: prometheus
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--web.external-url=http://localhost:1111/prometheus/'
+      - '--web.route-prefix=/prometheus/'
+    # Remove external port mapping - access through nginx
     depends_on:
       - backend
 
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
-    ports:
-      - "3001:3000"
+    # Remove external port mapping - access through nginx
     volumes:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
@@ -98,6 +117,8 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_SECURITY_ALLOW_EMBEDDING=true
       - GF_SECURITY_COOKIE_SAMESITE=none
+      - GF_SERVER_ROOT_URL=http://localhost:1111/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
     depends_on:
       - prometheus
 

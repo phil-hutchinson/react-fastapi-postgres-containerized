@@ -8,7 +8,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 def create_app():
-    app = FastAPI()
+    app = FastAPI(
+        root_path="/api"  # Set root path for reverse proxy
+    )
 
     setup_cors(app)
     # OpenTelemetry metrics setup

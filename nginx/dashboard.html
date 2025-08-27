@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Development Environment Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 80px;
+            background: #2d2d2d;
+            border-right: 2px solid #00d4ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar-button {
+            width: 60px;
+            height: 60px;
+            margin: 0.5rem 0;
+            background: #3d3d3d;
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-decoration: none;
+        }
+
+        .sidebar-button:hover {
+            background: #00d4ff;
+            color: #000;
+            transform: translateX(5px);
+        }
+
+        .sidebar-button.active {
+            background: #00d4ff;
+            color: #000;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+        }
+
+        .sidebar-button .tooltip {
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #333;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+            font-size: 0.9rem;
+            z-index: 1000;
+        }
+
+        .sidebar-button:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .main-content {
+            flex: 1;
+            background: #1a1a1a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff;
+            display: none;
+        }
+
+        .content-frame.active {
+            display: block;
+        }
+
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .welcome-screen.hidden {
+            display: none;
+        }
+
+        .welcome-title {
+            font-size: 3rem;
+            color: #00d4ff;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-bottom: 2rem;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            max-width: 1000px;
+            margin: 2rem 0;
+        }
+
+        .service-card {
+            background: #2d2d2d;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: left;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            border-color: #00d4ff;
+            transform: translateY(-2px);
+        }
+
+        .service-card h3 {
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .service-card p {
+            color: #ccc;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff00;
+        }
+
+        .status-indicator.loading {
+            background: #ffaa00;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-indicator.error {
+            background: #ff4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 26, 26, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #333;
+            border-top: 4px solid #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <button class="sidebar-button active" data-target="welcome" title="Dashboard Home">
+                🏠
+                <span class="tooltip">Dashboard Home</span>
+            </button>
+            
+            <button class="sidebar-button" data-target="frontend" data-url="http://localhost:3000" title="React Frontend">
+                ⚛️
+                <span class="tooltip">React Frontend</span>
+                <div class="status-indicator" id="status-frontend"></div>
+            </button>
+            
+            <button class="sidebar-button" data-target="backend" data-url="http://localhost:8000/docs" title="FastAPI Backend">
+                🚀
+                <span class="tooltip">FastAPI API Docs</span>
+                <div class="status-indicator" id="status-backend"></div>
+            </button>
+            
+            <button class="sidebar-button" data-target="pgadmin" data-url="http://localhost:5050" title="Database Admin">
+                🗄️
+                <span class="tooltip">pgAdmin</span>
+                <div class="status-indicator" id="status-pgadmin"></div>
+            </button>
+            
+            <button class="sidebar-button" data-target="grafana" data-url="http://localhost:3001" title="Grafana Dashboards">
+                📊
+                <span class="tooltip">Grafana</span>
+                <div class="status-indicator" id="status-grafana"></div>
+            </button>
+            
+            <button class="sidebar-button" data-target="prometheus" data-url="http://localhost:9090" title="Prometheus Metrics">
+                📈
+                <span class="tooltip">Prometheus</span>
+                <div class="status-indicator" id="status-prometheus"></div>
+            </button>
+        </nav>
+
+        <main class="main-content">
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+                <p>Loading service...</p>
+            </div>
+
+            <div class="welcome-screen" id="welcomeScreen">
+                <h1 class="welcome-title">🚀 Development Dashboard</h1>
+                <p class="welcome-subtitle">Your complete development environment in one place</p>
+                
+                <div class="service-grid">
+                    <div class="service-card" onclick="openServiceInNewTab('frontend')">
+                        <h3>⚛️ Application</h3>
+                        <p>Main application interface built with React. Hot reload enabled for development.</p>
+                    </div>
+                    
+                    <div class="service-card" onclick="openServiceInNewTab('backend')">
+                        <h3>🚀 RestAPI Swagger</h3>
+                        <p>REST API with automatic documentation, built with FastAPI and SQLAlchemy.</p>
+                    </div>
+                    
+                    <div class="service-card" onclick="openServiceInNewTab('pgadmin')">
+                        <h3>🗄️ Database Admin</h3>
+                        <p>pgAdmin interface for PostgreSQL database management and queries.</p>
+                    </div>
+                    
+                    <div class="service-card" onclick="openServiceInNewTab('grafana')">
+                        <h3>📊 Grafana</h3>
+                        <p>Metrics dashboards, alerting, and observability visualization platform.</p>
+                    </div>
+                    
+                    <div class="service-card" onclick="openServiceInNewTab('prometheus')">
+                        <h3>📈 Prometheus</h3>
+                        <p>Metrics collection and monitoring with time-series database.</p>
+                    </div>
+                </div>
+                
+                <p style="color: #666; margin-top: 2rem;">
+                    <strong>Navigation Options:</strong><br>
+                    • Click any <strong>sidebar icon</strong> to open services in an integrated iframe view<br>
+                    • Click any <strong>service card above</strong> to open services in a new browser tab for full-screen access
+                </p>
+                
+            </div>
+
+            <iframe class="content-frame" id="frame-frontend" src="about:blank"></iframe>
+            <iframe class="content-frame" id="frame-backend" src="about:blank"></iframe>
+            <iframe class="content-frame" id="frame-pgadmin" src="about:blank"></iframe>
+            <iframe class="content-frame" id="frame-grafana" src="about:blank"></iframe>
+            <iframe class="content-frame" id="frame-prometheus" src="about:blank"></iframe>
+        </main>
+    </div>
+
+    <script>
+        const services = {
+            'frontend': '/webapp/',
+            'backend': '/api/docs',
+            'pgadmin': '/pgadmin/',
+            'grafana': '/grafana/',
+            'prometheus': '/prometheus/'
+        };
+
+        let currentService = null;
+        let loadedServices = new Set();
+
+        // Check service status
+        async function checkServiceStatus(service, url) {
+            const statusElement = document.getElementById(`status-${service}`);
+            try {
+                statusElement.className = 'status-indicator loading';
+                const response = await fetch(url, { 
+                    mode: 'no-cors',
+                    method: 'GET'
+                });
+                statusElement.className = 'status-indicator';
+            } catch (error) {
+                statusElement.className = 'status-indicator error';
+            }
+        }
+
+        // Open service in new tab
+        function openServiceInNewTab(service) {
+            const url = services[service];
+            if (url) {
+                window.open(url, '_blank');
+            }
+        }
+
+        // Load service in iframe
+        function loadService(service) {
+            if (service === 'welcome') {
+                showWelcomeScreen();
+                return;
+            }
+
+            const iframe = document.getElementById(`frame-${service}`);
+            const url = services[service];
+            
+            if (!loadedServices.has(service)) {
+                showLoading();
+                iframe.src = url;
+                iframe.onload = () => {
+                    hideLoading();
+                    loadedServices.add(service);
+                };
+                iframe.onerror = () => {
+                    hideLoading();
+                    console.error(`Failed to load ${service}`);
+                };
+            }
+
+            showService(service);
+        }
+
+        function showService(service) {
+            // Hide welcome screen
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            
+            // Hide all frames
+            document.querySelectorAll('.content-frame').forEach(frame => {
+                frame.classList.remove('active');
+            });
+            
+            // Show selected frame
+            document.getElementById(`frame-${service}`).classList.add('active');
+            
+            // Update active button
+            document.querySelectorAll('.sidebar-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-target="${service}"]`).classList.add('active');
+            
+            currentService = service;
+        }
+
+        function showWelcomeScreen() {
+            // Hide all frames
+            document.querySelectorAll('.content-frame').forEach(frame => {
+                frame.classList.remove('active');
+            });
+            
+            // Show welcome screen
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            
+            // Update active button
+            document.querySelectorAll('.sidebar-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('[data-target="welcome"]').classList.add('active');
+            
+            currentService = 'welcome';
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+
+        // Event listeners
+        document.querySelectorAll('.sidebar-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const target = button.getAttribute('data-target');
+                loadService(target);
+            });
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Show welcome screen by default
+            showWelcomeScreen();
+            
+            // Check service status for all services
+            Object.entries(services).forEach(([service, url]) => {
+                checkServiceStatus(service, url);
+            });
+            
+            // Refresh status every 30 seconds
+            setInterval(() => {
+                Object.entries(services).forEach(([service, url]) => {
+                    checkServiceStatus(service, url);
+                });
+            }, 30000);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (event) => {
+            // ESC key to return to dashboard
+            if (event.key === 'Escape') {
+                if (currentService !== 'welcome') {
+                    showWelcomeScreen();
+                }
+            }
+            
+            // Number keys for quick service access
+            const serviceKeys = {
+                '1': 'frontend',
+                '2': 'backend', 
+                '3': 'pgadmin',
+                '4': 'grafana',
+                '5': 'prometheus'
+            };
+            
+            if (serviceKeys[event.key]) {
+                loadService(serviceKeys[event.key]);
+            }
+        });
+    </script>
+</body>
+</html>

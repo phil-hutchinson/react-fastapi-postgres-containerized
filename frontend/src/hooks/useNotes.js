@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
-
+import config from '../config';
 const NotesContext = createContext();
 
 export function NotesProvider({ children }) {
@@ -31,7 +31,7 @@ function useNotesProvider() {
   const [lockSuccess, setLockSuccess] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/notes/')
+    axios.get(`${config.apiBaseUrl}/notes/`)
       .then(res => setNotes(res.data))
       .catch(() => setNotesError('Could not fetch notes'));
   }, []);
@@ -44,7 +44,7 @@ function useNotesProvider() {
     setUpdateSuccess(null);
     setEditMode(false);
     setAddMode(false);
-    axios.get(`http://localhost:8000/notes/${uuid}`)
+    axios.get(`${config.apiBaseUrl}/notes/${uuid}`)
       .then(res => {
         setSelectedNote(res.data);
         setEditName(res.data.name);
@@ -60,7 +60,7 @@ function useNotesProvider() {
     e.preventDefault();
     setUpdateError(null);
     setUpdateSuccess(null);
-    axios.put(`http://localhost:8000/notes/${selectedNote.uuid}`,
+    axios.put(`${config.apiBaseUrl}/notes/${selectedNote.uuid}`,
       {
         name: editName,
         description: editDescription
@@ -101,7 +101,7 @@ function useNotesProvider() {
     setLockSuccess(null);
     if (!selectedNote || selectedNote.locked) return;
     if (window.confirm('Are you sure you want to lock this note? This action cannot be undone.')) {
-      axios.post(`http://localhost:8000/notes/${selectedNote.uuid}/actions/lock`)
+      axios.post(`${config.apiBaseUrl}/notes/${selectedNote.uuid}/actions/lock`)
         .then(res => {
           setSelectedNote(res.data);
           setLockSuccess('Note locked successfully!');
@@ -134,7 +134,7 @@ function useNotesProvider() {
     e.preventDefault();
     setAddError(null);
     setAddSuccess(null);
-    axios.post("http://localhost:8000/notes/", {
+    axios.post(`${config.apiBaseUrl}/notes/`, {
       name: addName,
       description: addDescription
     })
@@ -162,7 +162,7 @@ function useNotesProvider() {
   const handleDelete = () => {
     if (!selectedNote || selectedNote.locked) return;
     if (window.confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
-      axios.delete(`http://localhost:8000/notes/${selectedNote.uuid}`)
+      axios.delete(`${config.apiBaseUrl}/notes/${selectedNote.uuid}`)
         .then(() => {
           setNotes(notes.filter(n => n.uuid !== selectedNote.uuid));
           setSelectedNote(null);
