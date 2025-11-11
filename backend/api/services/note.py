@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from models.note import Note
-from api.schemas.note import NoteCreate, NoteSummary, NoteDetail, NoteUpdate
+from api.schemas.note import NoteCreate, NoteSummary, NoteDetail, NoteUpdate, DEFAULT_TENANT_ID
 from api.database import get_db
 from typing import List
 import logging
@@ -14,7 +14,10 @@ router = APIRouter(prefix="/notes", tags=["notes"])
 def create_note(note: NoteCreate, db: Session = Depends(get_db)):
     logger.info(f"Creating new note with name: {note.name}")
     try:
-        db_note = Note(name=note.name, description=note.description)
+        # Set default tenant_id if not provided
+        tenant_id = note.tenant_id if note.tenant_id is not None else DEFAULT_TENANT_ID
+        
+        db_note = Note(name=note.name, description=note.description, tenant_id=tenant_id)
         db.add(db_note)
         db.commit()
         db.refresh(db_note)

@@ -26,7 +26,7 @@ def test_create_note_success(mock_db):
     mock_db.refresh.side_effect = lambda obj: None
     # Patch Note constructor to return dummy_note
     original_Note = sut.Note
-    sut.Note = lambda name, description: dummy_note
+    sut.Note = lambda name, description, tenant_id: dummy_note
 
     # Act
     result = sut.create_note(note_data, db=mock_db)
@@ -49,10 +49,21 @@ def test_list_notes_success(mock_db):
         DummyNote(uuid="1", name="Note 1", description="Desc 1"),
         DummyNote(uuid="2", name="Note 2", description="Desc 2"),
     ]
+    # Store original Note class
+    original_Note = sut.Note
+    # Create a mock Note class with id attribute for order_by
+    mock_note_class = MagicMock()
+    mock_note_class.id = MagicMock()
+    mock_note_class.id.asc = MagicMock(return_value="id_asc")
+    sut.Note = mock_note_class
+    
     mock_db.query.return_value.order_by.return_value.all.return_value = dummy_notes
 
     # Act
     result = sut.list_notes(db=mock_db)
+    
+    # Restore
+    sut.Note = original_Note
 
     # Assert
     assert isinstance(result, list)
