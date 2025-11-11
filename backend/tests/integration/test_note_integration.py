@@ -229,10 +229,10 @@ class TestNoteIntegration:
         note_uuid = create_response.json()["uuid"]
         
         # Lock the note first time
-        client.put(f"/notes/{note_uuid}/lock")
+        client.post(f"/notes/{note_uuid}/actions/lock")
         
         # Act - try to lock again
-        response = client.put(f"/notes/{note_uuid}/lock")
+        response = client.post(f"/notes/{note_uuid}/actions/lock")
         
         # Assert
         assert response.status_code == 409
@@ -244,7 +244,7 @@ class TestNoteIntegration:
         fake_uuid = "00000000-0000-0000-0000-000000000000"
         
         # Act
-        response = client.put(f"/notes/{fake_uuid}/lock")
+        response = client.post(f"/notes/{fake_uuid}/actions/lock")
         
         # Assert
         assert response.status_code == 404
@@ -278,7 +278,7 @@ class TestNoteIntegration:
         note_uuid = create_response.json()["uuid"]
         
         # Lock the note
-        client.put(f"/notes/{note_uuid}/lock")
+        client.post(f"/notes/{note_uuid}/actions/lock")
         
         # Act
         response = client.delete(f"/notes/{note_uuid}")
