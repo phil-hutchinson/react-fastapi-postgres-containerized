@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from api.services import note as note_router
 from api.services import simulation as simulation_router
+from api.routers import tenant as tenant_router
 from api.middleware import setup_cors
 import logging
 
@@ -28,6 +29,7 @@ def create_app():
     
     app.include_router(note_router.router)
     app.include_router(simulation_router.router)
+    app.include_router(tenant_router.router)
 
     @app.get("/")
     def read_root():

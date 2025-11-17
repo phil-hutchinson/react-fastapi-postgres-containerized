@@ -59,25 +59,30 @@ Implement multi-tenancy with tenant_id + path-based routing (`/tenant1/api/notes
 
 ## Phase 2: Backend Tenant Logic (Still Using Default)
 
-### Step 3: Add Tenant Service Layer
+### Step 3: Add Tenant Service Layer ✅ COMPLETE
 **Goal**: Create tenant management logic without changing API behavior
 
 **Changes**:
-- [ ] Create `backend/services/tenant.py`:
+- [x] Create `backend/services/tenant.py`:
   - `get_tenant_by_slug(slug)` - Look up tenant
   - `get_tenant_by_id(id)` - Get tenant by ID
   - `create_tenant(slug, name)` - Create new tenant
   - `list_tenants()` - Get all tenants
-- [ ] Create `backend/schemas/tenant.py`:
+  - `update_tenant(slug, update_data)` - Update tenant
+- [x] Create `backend/schemas/tenant.py`:
   - `TenantCreate` (slug, name)
   - `TenantRead` (id, slug, name, created_at, is_active)
   - `TenantUpdate` (name, is_active)
-- [ ] Add unit tests for tenant service
+- [x] Add unit tests for tenant service (18 tests)
+- [x] Add logging tests for tenant service (13 tests)
+- [x] Add integration tests for tenant service (15 tests)
 
 **Testing**:
-- [ ] All existing tests pass
-- [ ] New tenant service tests pass
-- [ ] Can create, read tenants via service
+- [x] All existing tests pass (87 tests total)
+- [x] New tenant service tests pass
+- [x] Can create, read, update, list tenants via service
+- [x] Proper error handling (404, 409, 500)
+- [x] Logging in place for all operations
 
 **User Impact**: None - services exist but aren't used in API yet
 
