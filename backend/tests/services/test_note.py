@@ -51,13 +51,14 @@ def test_list_notes_success(mock_db):
     ]
     # Store original Note class
     original_Note = sut.Note
-    # Create a mock Note class with id attribute for order_by
+    # Create a mock Note class with id and tenant_id attributes
     mock_note_class = MagicMock()
     mock_note_class.id = MagicMock()
     mock_note_class.id.asc = MagicMock(return_value="id_asc")
+    mock_note_class.tenant_id = MagicMock()
     sut.Note = mock_note_class
     
-    mock_db.query.return_value.order_by.return_value.all.return_value = dummy_notes
+    mock_db.query.return_value.filter.return_value.order_by.return_value.all.return_value = dummy_notes
 
     # Act
     result = sut.list_notes(db=mock_db)
@@ -77,7 +78,7 @@ def test_get_note_detail_success(mock_db):
     # Arrange
     dummy_note = DummyNote(uuid="1", name="Note 1", description="Desc 1", locked=False)
 
-    mock_db.query.return_value.filter_by.return_value.first.return_value = dummy_note
+    mock_db.query.return_value.filter.return_value.first.return_value = dummy_note
 
     # Act
     result = sut.get_note_detail("1", db=mock_db)
@@ -91,7 +92,7 @@ def test_get_note_detail_success(mock_db):
 
 def test_get_note_detail_raises_404_when_note_not_found(mock_db):
     # Arrange
-    mock_db.query.return_value.filter_by.return_value.first.return_value = None
+    mock_db.query.return_value.filter.return_value.first.return_value = None
 
     # Act & Assert
     with pytest.raises(Exception) as exc_info:
@@ -104,7 +105,7 @@ def test_update_note_success(mock_db):
     # Arrange
     from api.schemas.note import NoteUpdate
     dummy_note = DummyNote(uuid="1", name="Old Name", description="Old Desc", locked=False)
-    mock_db.query.return_value.filter_by.return_value.first.return_value = dummy_note
+    mock_db.query.return_value.filter.return_value.first.return_value = dummy_note
     update = NoteUpdate(name="New Name", description="New Desc")
 
     # Act
@@ -122,7 +123,7 @@ def test_update_note_success(mock_db):
 def test_update_note_raises_404_when_note_not_found(mock_db):
     # Arrange
     from api.schemas.note import NoteUpdate
-    mock_db.query.return_value.filter_by.return_value.first.return_value = None
+    mock_db.query.return_value.filter.return_value.first.return_value = None
     update = NoteUpdate(name="New Name", description="New Desc")
 
     # Act & Assert
@@ -136,7 +137,7 @@ def test_update_note_raises_409_when_note_locked(mock_db):
     # Arrange
     from api.schemas.note import NoteUpdate
     dummy_note = DummyNote(uuid="1", name="Old Name", description="Old Desc", locked=True)
-    mock_db.query.return_value.filter_by.return_value.first.return_value = dummy_note
+    mock_db.query.return_value.filter.return_value.first.return_value = dummy_note
     update = NoteUpdate(name="New Name", description="New Desc")
 
     # Act & Assert
@@ -149,7 +150,7 @@ def test_update_note_raises_409_when_note_locked(mock_db):
 def test_lock_note_success(mock_db):
     # Arrange
     dummy_note = DummyNote(uuid="1", name="Note 1", description="Desc 1", locked=False)
-    mock_db.query.return_value.filter_by.return_value.first.return_value = dummy_note
+    mock_db.query.return_value.filter.return_value.first.return_value = dummy_note
 
     # Act
     result = sut.lock_note("1", db=mock_db)
@@ -165,7 +166,7 @@ def test_lock_note_success(mock_db):
 
 def test_lock_note_raises_404_when_note_not_found(mock_db):
     # Arrange
-    mock_db.query.return_value.filter_by.return_value.first.return_value = None
+    mock_db.query.return_value.filter.return_value.first.return_value = None
 
     # Act & Assert
     with pytest.raises(Exception) as exc_info:
@@ -177,7 +178,7 @@ def test_lock_note_raises_404_when_note_not_found(mock_db):
 def test_lock_note_raises_409_when_note_already_locked(mock_db):
     # Arrange
     dummy_note = DummyNote(uuid="1", name="Note 1", description="Desc 1", locked=True)
-    mock_db.query.return_value.filter_by.return_value.first.return_value = dummy_note
+    mock_db.query.return_value.filter.return_value.first.return_value = dummy_note
 
     # Act & Assert
     with pytest.raises(Exception) as exc_info:
@@ -189,7 +190,7 @@ def test_lock_note_raises_409_when_note_already_locked(mock_db):
 def test_delete_note_success(mock_db):
     # Arrange
     dummy_note = DummyNote(uuid="1", name="Note 1", description="Desc 1", locked=False)
-    mock_db.query.return_value.filter_by.return_value.first.return_value = dummy_note
+    mock_db.query.return_value.filter.return_value.first.return_value = dummy_note
 
     # Act
     result = sut.delete_note("1", db=mock_db)
@@ -202,7 +203,7 @@ def test_delete_note_success(mock_db):
 
 def test_delete_note_raises_404_when_note_not_found(mock_db):
     # Arrange
-    mock_db.query.return_value.filter_by.return_value.first.return_value = None
+    mock_db.query.return_value.filter.return_value.first.return_value = None
 
     # Act & Assert
     with pytest.raises(Exception) as exc_info:
@@ -214,7 +215,7 @@ def test_delete_note_raises_404_when_note_not_found(mock_db):
 def test_delete_note_raises_409_when_note_locked(mock_db):
     # Arrange
     dummy_note = DummyNote(uuid="1", name="Note 1", description="Desc 1", locked=True)
-    mock_db.query.return_value.filter_by.return_value.first.return_value = dummy_note
+    mock_db.query.return_value.filter.return_value.first.return_value = dummy_note
 
     # Act & Assert
     with pytest.raises(Exception) as exc_info:

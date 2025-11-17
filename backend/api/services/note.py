@@ -5,23 +5,22 @@ from models.note import Note
 from api.schemas.note import NoteCreate, NoteSummary, NoteDetail, NoteUpdate, DEFAULT_TENANT_ID
 from api.database import get_db
 from typing import List
+import uuid
 import logging
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/notes", tags=["notes"])
 
 @router.post("/", response_model=NoteDetail)
-def create_note(note: NoteCreate, db: Session = Depends(get_db)):
-    logger.info(f"Creating new note with name: {note.name}")
+def create_note(note: NoteCreate, db: Session = Depends(get_db), tenant_id: uuid.UUID = DEFAULT_TENANT_ID):
+    logger.info(f"Creating new note with name: {note.name} for tenant: {tenant_id}")
     try:
-        # Set default tenant_id if not provided
-        tenant_id = note.tenant_id if note.tenant_id is not None else DEFAULT_TENANT_ID
-        
+        # Use tenant_id parameter (defaults to DEFAULT_TENANT_ID)
         db_note = Note(name=note.name, description=note.description, tenant_id=tenant_id)
         db.add(db_note)
         db.commit()
         db.refresh(db_note)
-        logger.info(f"Successfully created note with UUID: {db_note.uuid}")
+        logger.info(f"Successfully created note with UUID: {db_note.uuid} for tenant: {tenant_id}")
         return {"uuid": str(db_note.uuid), "name": db_note.name, "description": db_note.description, "locked": db_note.locked}
     except SQLAlchemyError as e:
         logger.error(f"Database error while creating note: {str(e)}")
@@ -32,11 +31,11 @@ def create_note(note: NoteCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.get("/", response_model=List[NoteSummary])
-def list_notes(db: Session = Depends(get_db)):
-    logger.info("Fetching all notes")
+def list_notes(db: Session = Depends(get_db), tenant_id: uuid.UUID = DEFAULT_TENANT_ID):
+    logger.info(f"Fetching notes for tenant: {tenant_id}")
     try:
-        notes = db.query(Note).order_by(Note.id.asc()).all()
-        logger.info(f"Successfully retrieved {len(notes)} notes")
+        notes = db.query(Note).filter(Note.tenant_id == tenant_id).order_by(Note.id.asc()).all()
+        logger.info(f"Successfully retrieved {len(notes)} notes for tenant: {tenant_id}")
         return [{"uuid": str(e.uuid), "name": e.name} for e in notes]
     except SQLAlchemyError as e:
         logger.error(f"Database error while fetching notes: {str(e)}")
@@ -46,14 +45,14 @@ def list_notes(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.get("/{uuid}", response_model=NoteDetail)
-def get_note_detail(uuid: str, db: Session = Depends(get_db)):
-    logger.info(f"Fetching note details for UUID: {uuid}")
+def get_note_detail(uuid: str, db: Session = Depends(get_db), tenant_id: uuid.UUID = DEFAULT_TENANT_ID):
+    logger.info(f"Fetching note details for UUID: {uuid}, tenant: {tenant_id}")
     try:
-        note = db.query(Note).filter_by(uuid=uuid).first()
+        note = db.query(Note).filter(Note.uuid == uuid, Note.tenant_id == tenant_id).first()
         if not note:
-            logger.warning(f"Note not found for UUID: {uuid}")
+            logger.warning(f"Note not found for UUID: {uuid}, tenant: {tenant_id}")
             raise HTTPException(status_code=404, detail="Note not found")
-        logger.info(f"Successfully retrieved note: {note.name}")
+        logger.info(f"Successfully retrieved note: {note.name} for tenant: {tenant_id}")
         return {"uuid": str(note.uuid), "name": note.name, "description": note.description, "locked": note.locked}
     except HTTPException:
         raise  # Re-raise HTTP exceptions as-is
@@ -65,12 +64,12 @@ def get_note_detail(uuid: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.put("/{uuid}", response_model=NoteDetail)
-def update_note(uuid: str, update: NoteUpdate, db: Session = Depends(get_db)):
-    logger.info(f"Updating note with UUID: {uuid}")
+def update_note(uuid: str, update: NoteUpdate, db: Session = Depends(get_db), tenant_id: uuid.UUID = DEFAULT_TENANT_ID):
+    logger.info(f"Updating note with UUID: {uuid}, tenant: {tenant_id}")
     try:
-        note = db.query(Note).filter_by(uuid=uuid).first()
+        note = db.query(Note).filter(Note.uuid == uuid, Note.tenant_id == tenant_id).first()
         if not note:
-            logger.warning(f"Note not found for update, UUID: {uuid}")
+            logger.warning(f"Note not found for update, UUID: {uuid}, tenant: {tenant_id}")
             raise HTTPException(status_code=404, detail="Note not found")
         if note.locked:
             logger.warning(f"Attempted to update locked note: {uuid}")
@@ -82,7 +81,7 @@ def update_note(uuid: str, update: NoteUpdate, db: Session = Depends(get_db)):
             note.description = update.description
         db.commit()
         db.refresh(note)
-        logger.info(f"Successfully updated note: {note.name}")
+        logger.info(f"Successfully updated note: {note.name} for tenant: {tenant_id}")
         return {"uuid": str(note.uuid), "name": note.name, "description": note.description, "locked": note.locked}
     except HTTPException:
         raise  # Re-raise HTTP exceptions as-is
@@ -95,12 +94,12 @@ def update_note(uuid: str, update: NoteUpdate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.post("/{uuid}/actions/lock", response_model=NoteDetail)
-def lock_note(uuid: str, db: Session = Depends(get_db)):
-    logger.info(f"Locking note with UUID: {uuid}")
+def lock_note(uuid: str, db: Session = Depends(get_db), tenant_id: uuid.UUID = DEFAULT_TENANT_ID):
+    logger.info(f"Locking note with UUID: {uuid}, tenant: {tenant_id}")
     try:
-        note = db.query(Note).filter_by(uuid=uuid).first()
+        note = db.query(Note).filter(Note.uuid == uuid, Note.tenant_id == tenant_id).first()
         if not note:
-            logger.warning(f"Note not found for locking, UUID: {uuid}")
+            logger.warning(f"Note not found for locking, UUID: {uuid}, tenant: {tenant_id}")
             raise HTTPException(status_code=404, detail="Note not found")
         if note.locked:
             logger.warning(f"Attempted to lock already locked note: {uuid}")
@@ -109,7 +108,7 @@ def lock_note(uuid: str, db: Session = Depends(get_db)):
         note.locked = True
         db.commit()
         db.refresh(note)
-        logger.info(f"Successfully locked note: {note.name}")
+        logger.info(f"Successfully locked note: {note.name} for tenant: {tenant_id}")
         return {"uuid": str(note.uuid), "name": note.name, "description": note.description, "locked": note.locked}
     except HTTPException:
         raise  # Re-raise HTTP exceptions as-is
@@ -122,12 +121,12 @@ def lock_note(uuid: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.delete("/{uuid}", response_model=dict)
-def delete_note(uuid: str, db: Session = Depends(get_db)):
-    logger.info(f"Deleting note with UUID: {uuid}")
+def delete_note(uuid: str, db: Session = Depends(get_db), tenant_id: uuid.UUID = DEFAULT_TENANT_ID):
+    logger.info(f"Deleting note with UUID: {uuid}, tenant: {tenant_id}")
     try:
-        note = db.query(Note).filter_by(uuid=uuid).first()
+        note = db.query(Note).filter(Note.uuid == uuid, Note.tenant_id == tenant_id).first()
         if not note:
-            logger.warning(f"Note not found for deletion, UUID: {uuid}")
+            logger.warning(f"Note not found for deletion, UUID: {uuid}, tenant: {tenant_id}")
             raise HTTPException(status_code=404, detail="Note not found")
         if note.locked:
             logger.warning(f"Attempted to delete locked note: {uuid}")
@@ -136,7 +135,7 @@ def delete_note(uuid: str, db: Session = Depends(get_db)):
         note_name = note.name  # Store name for logging before deletion
         db.delete(note)
         db.commit()
-        logger.info(f"Successfully deleted note: {note_name}")
+        logger.info(f"Successfully deleted note: {note_name} for tenant: {tenant_id}")
         return {"detail": "Note deleted"}
     except HTTPException:
         raise  # Re-raise HTTP exceptions as-is

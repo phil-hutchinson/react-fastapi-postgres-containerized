@@ -22,7 +22,7 @@ def mock_db():
 # --- update_note ---
 def test_update_note_logs_warning_when_not_found(mock_db):
     update = NoteUpdate(name="New Name", description="New Desc")
-    mock_db.query.return_value.filter_by.return_value.first.return_value = None
+    mock_db.query.return_value.filter.return_value.first.return_value = None
     with patch.object(sut.logger, "warning") as mock_warning:
         with pytest.raises(Exception):
             sut.update_note("nonexistent", update, db=mock_db)
@@ -32,7 +32,7 @@ def test_update_note_logs_warning_when_not_found(mock_db):
 def test_update_note_logs_warning_when_locked(mock_db):
     update = NoteUpdate(name="New Name", description="New Desc")
     dummy_note = DummyNote(uuid="1", name="Old Name", description="Old Desc", locked=True)
-    mock_db.query.return_value.filter_by.return_value.first.return_value = dummy_note
+    mock_db.query.return_value.filter.return_value.first.return_value = dummy_note
     with patch.object(sut.logger, "warning") as mock_warning:
         with pytest.raises(Exception):
             sut.update_note("1", update, db=mock_db)
@@ -42,7 +42,7 @@ def test_update_note_logs_warning_when_locked(mock_db):
 def test_update_note_logs_error_on_db_error(mock_db):
     update = NoteUpdate(name="New Name", description="New Desc")
     dummy_note = DummyNote(uuid="1", name="Old Name", description="Old Desc", locked=False)
-    mock_db.query.return_value.filter_by.return_value.first.return_value = dummy_note
+    mock_db.query.return_value.filter.return_value.first.return_value = dummy_note
     mock_db.commit.side_effect = Exception("DB error")
     with patch.object(sut.logger, "error") as mock_error:
         with pytest.raises(Exception):
@@ -52,7 +52,7 @@ def test_update_note_logs_error_on_db_error(mock_db):
 
 # --- get_note_detail ---
 def test_get_note_detail_logs_warning_when_not_found(mock_db):
-    mock_db.query.return_value.filter_by.return_value.first.return_value = None
+    mock_db.query.return_value.filter.return_value.first.return_value = None
     with patch.object(sut.logger, "warning") as mock_warning:
         with pytest.raises(Exception):
             sut.get_note_detail("nonexistent", db=mock_db)
@@ -60,7 +60,7 @@ def test_get_note_detail_logs_warning_when_not_found(mock_db):
         assert "not found" in mock_warning.call_args[0][0].lower()
 
 def test_get_note_detail_logs_error_on_db_error(mock_db):
-    mock_db.query.return_value.filter_by.return_value.first.side_effect = Exception("DB error")
+    mock_db.query.return_value.filter.return_value.first.side_effect = Exception("DB error")
     with patch.object(sut.logger, "error") as mock_error:
         with pytest.raises(Exception):
             sut.get_note_detail("1", db=mock_db)
@@ -69,7 +69,7 @@ def test_get_note_detail_logs_error_on_db_error(mock_db):
 
 # --- lock_note ---
 def test_lock_note_logs_warning_when_not_found(mock_db):
-    mock_db.query.return_value.filter_by.return_value.first.return_value = None
+    mock_db.query.return_value.filter.return_value.first.return_value = None
     with patch.object(sut.logger, "warning") as mock_warning:
         with pytest.raises(Exception):
             sut.lock_note("nonexistent", db=mock_db)
@@ -78,7 +78,7 @@ def test_lock_note_logs_warning_when_not_found(mock_db):
 
 def test_lock_note_logs_warning_when_already_locked(mock_db):
     dummy_note = DummyNote(uuid="1", name="Note 1", description="Desc 1", locked=True)
-    mock_db.query.return_value.filter_by.return_value.first.return_value = dummy_note
+    mock_db.query.return_value.filter.return_value.first.return_value = dummy_note
     with patch.object(sut.logger, "warning") as mock_warning:
         with pytest.raises(Exception):
             sut.lock_note("1", db=mock_db)
@@ -87,7 +87,7 @@ def test_lock_note_logs_warning_when_already_locked(mock_db):
 
 def test_lock_note_logs_error_on_db_error(mock_db):
     dummy_note = DummyNote(uuid="1", name="Note 1", description="Desc 1", locked=False)
-    mock_db.query.return_value.filter_by.return_value.first.return_value = dummy_note
+    mock_db.query.return_value.filter.return_value.first.return_value = dummy_note
     mock_db.commit.side_effect = Exception("DB error")
     with patch.object(sut.logger, "error") as mock_error:
         with pytest.raises(Exception):
@@ -97,7 +97,7 @@ def test_lock_note_logs_error_on_db_error(mock_db):
 
 # --- delete_note ---
 def test_delete_note_logs_warning_when_not_found(mock_db):
-    mock_db.query.return_value.filter_by.return_value.first.return_value = None
+    mock_db.query.return_value.filter.return_value.first.return_value = None
     with patch.object(sut.logger, "warning") as mock_warning:
         with pytest.raises(Exception):
             sut.delete_note("nonexistent", db=mock_db)
@@ -106,7 +106,7 @@ def test_delete_note_logs_warning_when_not_found(mock_db):
 
 def test_delete_note_logs_warning_when_locked(mock_db):
     dummy_note = DummyNote(uuid="1", name="Note 1", description="Desc 1", locked=True)
-    mock_db.query.return_value.filter_by.return_value.first.return_value = dummy_note
+    mock_db.query.return_value.filter.return_value.first.return_value = dummy_note
     with patch.object(sut.logger, "warning") as mock_warning:
         with pytest.raises(Exception):
             sut.delete_note("1", db=mock_db)
@@ -115,10 +115,11 @@ def test_delete_note_logs_warning_when_locked(mock_db):
 
 def test_delete_note_logs_error_on_db_error(mock_db):
     dummy_note = DummyNote(uuid="1", name="Note 1", description="Desc 1", locked=False)
-    mock_db.query.return_value.filter_by.return_value.first.return_value = dummy_note
+    mock_db.query.return_value.filter.return_value.first.return_value = dummy_note
     mock_db.commit.side_effect = Exception("DB error")
     with patch.object(sut.logger, "error") as mock_error:
         with pytest.raises(Exception):
             sut.delete_note("1", db=mock_db)
         mock_error.assert_called()
         assert "db error" in mock_error.call_args[0][0].lower()
+

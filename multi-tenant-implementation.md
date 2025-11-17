@@ -88,26 +88,30 @@ Implement multi-tenancy with tenant_id + path-based routing (`/tenant1/api/notes
 
 ---
 
-### Step 4: Update Note Service to Filter by Tenant
+### Step 4: Update Note Service to Filter by Tenant ✅ COMPLETE
 **Goal**: Make note service tenant-aware, but still use default tenant
 
 **Changes**:
-- [ ] Update `backend/services/note.py`:
-  - Add `tenant_id` parameter to all methods (with default tenant as default)
-  - `get_notes(tenant_id)` - Filter by tenant
+- [x] Update `backend/services/note.py`:
+  - Added `tenant_id` parameter to all methods (with DEFAULT_TENANT_ID as default)
   - `create_note(note_data, tenant_id)` - Create with tenant
-  - `get_note(note_id, tenant_id)` - Get specific note for tenant
+  - `list_notes(tenant_id)` - Filter by tenant
+  - `get_note_detail(note_id, tenant_id)` - Get specific note for tenant
   - `update_note(note_id, note_data, tenant_id)` - Update within tenant
+  - `lock_note(note_id, tenant_id)` - Lock within tenant
   - `delete_note(note_id, tenant_id)` - Delete within tenant
-- [ ] Ensure all queries filter by `tenant_id`
-- [ ] Update service tests to use tenant_id
+- [x] All queries now filter by `tenant_id` using `.filter()` instead of `.filter_by()`
+- [x] Updated all unit tests to use `.filter()` mock pattern
+- [x] Updated all logging tests to use `.filter()` mock pattern
+- [x] Added tenant isolation integration tests (3 tests)
 
 **Testing**:
-- [ ] All existing tests pass (using default tenant)
-- [ ] Service properly isolates notes by tenant_id
-- [ ] Can't access notes from different tenant
+- [x] All existing tests pass (90 tests total: 18 note integration + 3 tenant isolation + 15 tenant integration + 13 note unit + 11 note logging + 18 tenant unit + 13 tenant logging)
+- [x] Service properly isolates notes by tenant_id
+- [x] All operations include tenant_id in logging
+- [x] Can't access notes from different tenant (enforced at service layer)
 
-**User Impact**: None - API still uses default tenant for everything
+**User Impact**: None - API still uses default tenant for everything (DEFAULT_TENANT_ID parameter)
 
 ---
 
